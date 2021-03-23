@@ -20,14 +20,14 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-   <build>
+  <build>
     <pluginManagement>
       <plugins>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.0.0-M1</version>
           <configuration>
-            <skip>true</skip>
+            <skip>false</skip>
           </configuration>
         </plugin>
       </plugins>

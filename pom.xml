@@ -24,7 +24,7 @@
   </dependencies>
   <modules>
     <module>utilization-core</module>
-    <module>draw-3d</module>
+    <module>draw3d</module>
     <module>demo</module>
   </modules>
   <distributionManagement>
