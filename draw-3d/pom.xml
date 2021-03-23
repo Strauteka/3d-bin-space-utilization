@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.strauteka.3d-bin-space-utilization</groupId>
+    <artifactId>parent</artifactId>
+    <version>v1.0.0</version>
+  </parent>
+  <groupId>org.strauteka.3d-bin-space-utilization</groupId>
+  <artifactId>draw-3d</artifactId>
+  <version>v1.0.0</version>
+  <name>draw-3d</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+     <dependency>
+        <groupId>java3d</groupId>
+        <artifactId>vecmath</artifactId>
+        <version>1.3.1</version>
+      </dependency>
+       <dependency>
+            <groupId>org.strauteka.3d-bin-space-utilization</groupId>
+            <artifactId>utilization-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+      <!-- https://mvnrepository.com/artifact/java3d/j3dcore -->
+      <dependency>
+          <groupId>java3d</groupId>
+          <artifactId>j3dcore</artifactId>
+          <version>1.5.2</version>
+      </dependency>
+        <!-- https://mvnrepository.com/artifact/java3d/j3dutils -->
+      <dependency>
+          <groupId>java3d</groupId>
+          <artifactId>j3dutils</artifactId>
+          <version>1.5.2</version>
+      </dependency>
+       <!-- https://mvnrepository.com/artifact/net.java.dev.swing-layout/swing-layout -->
+      <dependency>
+          <groupId>net.java.dev.swing-layout</groupId>
+          <artifactId>swing-layout</artifactId>
+          <version>1.0.2</version>
+      </dependency>
+  </dependencies>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.0.0-M1</version>
+          <configuration>
+            <skip>false</skip>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

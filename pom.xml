@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+          
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.strauteka.3d-bin-space-utilization</groupId>
+  <artifactId>parent</artifactId>
+  <packaging>pom</packaging>
+  <version>v1.0.0</version>
+  <name>parent</name>
+  <url>https://github.com/Strauteka/3d-bin-space-utilization</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <modules>
+    <module>utilization-core</module>
+    <module>draw-3d</module>
+    <module>demo</module>
+  </modules>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub strauteka Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/strauteka/3d-bin-space-utilization</url>
+    </repository>
+  </distributionManagement>
+</project>
