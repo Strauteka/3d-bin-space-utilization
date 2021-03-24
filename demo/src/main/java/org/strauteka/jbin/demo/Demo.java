@@ -29,9 +29,10 @@ public class Demo {
         final Cargo<Size> x = new Cargo<Size>(new Size(300, 200, 500), new Size(0, 0, 200));
         final Cargo<Size> y = new Cargo<Size>(new Size(500, 300, 200), new Size(200, 0, 0));
         final Cargo<Size> z = new Cargo<Size>(new Size(300, 200, 300), new Size(300, 0, 200));
-        final Cargo<Size> w = new Cargo<Size>(new Size(600, 200, 300), new Size(0, 0, 700));
+        final Cargo<Size> w = new Cargo<Size>(new Size(600, 200, 300), new Size(200, 0, 700));
         final Cargo<Size> o = new Cargo<Size>(new Size(300, 200, 200), new Size(300, 0, 500));
-        final Cargo<Size> xx = new Cargo<Size>(new Size(200, 200, 200), Rotation.lhw, new Size(100, 200, 300));
+        // final Cargo<Size> xx = new Cargo<Size>(new Size(200, 200, 200), Rotation.lhw,
+        // new Size(100, 200, 300));
 
         b.add(s);
         b.add(x);
@@ -39,7 +40,7 @@ public class Demo {
         b.add(z);
         b.add(w);
         b.add(o);
-        b.add(xx);
+        // b.add(xx);
         return b;
     }
 
