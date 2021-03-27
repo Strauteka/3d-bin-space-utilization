@@ -39,6 +39,9 @@ Notes:
 
 ![draw-demo.jpg](./resources/draw-demo.png)
 
+Over-stack space
+![draw-demo4.jpg](./resources/draw-demo4.png)
+
 ## Preview demo algorithm
 
 5 types of items.

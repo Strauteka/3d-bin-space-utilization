@@ -26,7 +26,7 @@
       </dependency>
        <dependency>
             <groupId>org.strauteka.3d-bin-space-utilization</groupId>
-            <artifactId>utilization-core</artifactId>
+            <artifactId>space-utilization-core</artifactId>
             <version>${project.version}</version>
         </dependency>
       <!-- https://mvnrepository.com/artifact/java3d/j3dcore -->

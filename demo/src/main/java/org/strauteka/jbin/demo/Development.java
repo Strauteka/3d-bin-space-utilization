@@ -15,6 +15,7 @@ public class Development {
         List<Bin> bins = new ArrayList<>();
         bins.add(test2());
         bins.add(test3());
+        bins.add(test4());
         Draw3d.draw(bins.toArray(new Bin[0]));
     }
 
@@ -27,7 +28,7 @@ public class Development {
     }
 
     public static Bin test2() {
-        final Bin b = new Bin(new Size(1000, 1000, 1000), new StackConfig(20, 50, 20, 50));
+        final Bin b = new Bin(new Size(1000, 700, 1000));
         final Cargo<Size> s = new Cargo<Size>(new Size(200, 200, 200), new Size(0, 0, 0));
         final Cargo<Size> x = new Cargo<Size>(new Size(300, 200, 500), new Size(0, 0, 200));
         final Cargo<Size> y = new Cargo<Size>(new Size(500, 300, 200), new Size(200, 0, 0));
@@ -44,6 +45,18 @@ public class Development {
         b.add(w);
         b.add(o);
         // b.add(xx);
+        return b;
+    }
+
+    public static Bin test4() {
+        final Bin b = new Bin(new Size(1000, 700, 1000), new StackConfig(20, 1000, 20, 1000));
+        final Cargo<Size> w = new Cargo<Size>(new Size(300, 200, 400), new Size(150, 0, 150));
+        final Cargo<Size> x = new Cargo<Size>(new Size(200, 200, 300), new Size(200, 0, 550));
+        final Cargo<Size> y = new Cargo<Size>(new Size(200, 200, 200), new Size(450, 0, 150));
+
+        b.add(x);
+        b.add(y);
+        b.add(w);
         return b;
     }
 }
