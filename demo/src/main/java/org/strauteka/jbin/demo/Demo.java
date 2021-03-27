@@ -23,6 +23,33 @@ public class Demo {
         Draw3d.draw(bins.toArray(new Bin[0]));
     }
 
+    public static void drawRotations() {
+        List<Bin> bins = new ArrayList<>();
+        Size binSize = new Size(500, 500, 500);
+        Size s = new Size(150, 300, 500);
+        Size pos = new Size(0, 0, 0);
+        final Bin b1 = new Bin(binSize);
+        final Bin b2 = new Bin(binSize);
+        final Bin b3 = new Bin(binSize);
+        final Bin b4 = new Bin(binSize);
+        final Bin b5 = new Bin(binSize);
+        final Bin b6 = new Bin(binSize);
+
+        b1.add(new Cargo<Size>(s, Rotation.lhw, pos));
+        b2.add(new Cargo<Size>(s, Rotation.whl, pos));
+        b3.add(new Cargo<Size>(s, Rotation.wlh, pos));
+        b4.add(new Cargo<Size>(s, Rotation.hlw, pos));
+        b5.add(new Cargo<Size>(s, Rotation.hwl, pos));
+        b6.add(new Cargo<Size>(s, Rotation.lwh, pos));
+        bins.add(b1);
+        bins.add(b2);
+        bins.add(b3);
+        bins.add(b4);
+        bins.add(b5);
+        bins.add(b6);
+        Draw3d.draw(true, bins.toArray(new Bin[0]));
+    }
+
     public static Bin test3() {
         final Bin b = new Bin(new Size(1000, 1000, 1000));
         final Cargo<Size> s = new Cargo<Size>(new Size(200, 200, 200), new Size(0, 0, 0));

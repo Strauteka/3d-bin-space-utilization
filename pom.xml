@@ -23,7 +23,7 @@
     </dependency>
   </dependencies>
   <modules>
-    <module>utilization-core</module>
+    <module>core</module>
     <module>draw3d</module>
     <module>demo</module>
   </modules>

@@ -65,7 +65,7 @@ public class Draw3d<T extends Space> extends JPanel {
      * Fill your 3D world with content
      */
 
-    public Draw3d(List<Bin> containers, javax.vecmath.Point3f myPointer) {
+    public Draw3d(List<Bin> containers, javax.vecmath.Point3f myPointer, boolean skipEmptySpace) {
 
         Point3f startPointer = new Point3f(myPointer.x, myPointer.y, myPointer.z);
 
@@ -107,7 +107,7 @@ public class Draw3d<T extends Space> extends JPanel {
 
         for (Bin container : containers) {
             // System.out.println("Draw bin: " + container.toString());
-            drawContent(objRotate, container, startPointer); // getShape
+            drawContent(objRotate, container, startPointer, skipEmptySpace); // getShape
             startPointer.x = (startPointer.x + translate(container.w()) + 0.1f);
         }
 
@@ -143,9 +143,9 @@ public class Draw3d<T extends Space> extends JPanel {
         simpleU.addBranchGraph(scene);
     }
 
-    private void drawBox(TransformGroup objRotate, Cargo<?> content, Point3f posPointer) {
+    private void drawBox(TransformGroup objRotate, Cargo<?> content, Point3f posPointer, boolean skipEmptySpace) {
         if (content.cargo() instanceof Bin) {
-            drawContent(objRotate, ((Bin) content.cargo()).binTurn(content.rotation()), posPointer);
+            drawContent(objRotate, ((Bin) content.cargo()).binTurn(content.rotation()), posPointer, skipEmptySpace);
         } else {
             final Dimension size = content.cargo().rotate(content.rotation());
             final Dimension stack = content.stack();
@@ -164,25 +164,26 @@ public class Draw3d<T extends Space> extends JPanel {
         objRotate.addChild(draw3DRectangle(posPointer, size, col, false));
     }
 
-    private void drawContent(TransformGroup objRotate, Bin container, Point3f startPointer) {
+    private void drawContent(TransformGroup objRotate, Bin container, Point3f startPointer, boolean skipEmptySpace) {
         objRotate.addChild(draw3DRectangleLine(startPointer, container, new Color3f(0.0f, 0.0f, 0.0f)));
         for (Cargo<?> cargo : container.cargo()) {
             final Point3f cargoPosPoint = new Point3f(startPointer.x + translate(cargo.w_()),
                     startPointer.y + translate(cargo.h_()), startPointer.z + translate(cargo.l_()));
-            drawBox(objRotate, cargo, cargoPosPoint);
+            drawBox(objRotate, cargo, cargoPosPoint, skipEmptySpace);
         }
+        if (!skipEmptySpace) {
+            for (Space space : container.emptySpace()) {
+                final Point3f spacePosPoint = new Point3f(startPointer.x + translate(space.w_()),
+                        startPointer.y + translate(space.h_()), startPointer.z + translate(space.l_()));
+                Random rnd = new Random();
+                // if (space.getPositionPoint().getHeight()== 0) {
+                Color3f col = new Color3f(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat());
+                objRotate.addChild(draw3DRectangleLine(spacePosPoint, space, col));
+                objRotate.addChild(draw3DPoint(spacePosPoint, col));
+                // objRotate.addChild(draw3DRectangle(posPointer, space.getSize(), new
+                // Color3f(rnd.nextFloat(),rnd.nextFloat(),rnd.nextFloat()),true));
 
-        for (Space space : container.emptySpace()) {
-            final Point3f spacePosPoint = new Point3f(startPointer.x + translate(space.w_()),
-                    startPointer.y + translate(space.h_()), startPointer.z + translate(space.l_()));
-            Random rnd = new Random();
-            // if (space.getPositionPoint().getHeight()== 0) {
-            Color3f col = new Color3f(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat());
-            objRotate.addChild(draw3DRectangleLine(spacePosPoint, space, col));
-            objRotate.addChild(draw3DPoint(spacePosPoint, col));
-            // objRotate.addChild(draw3DRectangle(posPointer, space.getSize(), new
-            // Color3f(rnd.nextFloat(),rnd.nextFloat(),rnd.nextFloat()),true));
-
+            }
         }
 
         ///
@@ -464,13 +465,17 @@ public class Draw3d<T extends Space> extends JPanel {
     }
 
     public static void draw(Bin... b) {
+        draw(false, b);
+    }
+
+    public static void draw(boolean skipEmptySpace, Bin... b) {
         List<Bin> con = Arrays.asList(b);
         javax.vecmath.Point3f startPointer3D = new Point3f(
                 -(translate(con.get(0).w()) * con.size() + (con.size() - 1) * 0.1f) / 2, -translate(con.get(0).h()) / 2,
                 -translate(con.get(0).l()) / 2);
 
         JFrame frame = new JFrame();
-        frame.add(new JScrollPane(new Draw3d<Space>(con, startPointer3D)));
+        frame.add(new JScrollPane(new Draw3d<Space>(con, startPointer3D, skipEmptySpace)));
         frame.setSize(1200, 800);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

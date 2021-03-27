@@ -73,6 +73,9 @@ public class PackerEntry {
         List<Item> collector = new ArrayList<>();
         collector.add(new Item(400, 500, 1000, 10));
         collector.add(new Item(567, 532, 538, 10));
+        collector.add(new Item(359, 265, 129, 200));
+        collector.add(new Item(760, 300, 450, 200));
+        collector.add(new Item(300, 300, 300, 200));
         return collector;
     }
 

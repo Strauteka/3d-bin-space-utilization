@@ -8,9 +8,9 @@
     <version>v1.0.0</version>
   </parent>
   <groupId>org.strauteka.3d-bin-space-utilization</groupId>
-  <artifactId>utilization-core</artifactId>
+  <artifactId>space-utilization-core</artifactId>
   <version>v1.0.0</version>
-  <name>utilization-core</name>
+  <name>space-utilization-core</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
