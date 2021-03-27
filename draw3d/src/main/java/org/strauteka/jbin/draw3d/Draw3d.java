@@ -171,6 +171,7 @@ public class Draw3d<T extends Space> extends JPanel {
                     startPointer.y + translate(cargo.h_()), startPointer.z + translate(cargo.l_()));
             drawBox(objRotate, cargo, cargoPosPoint);
         }
+
         for (Space space : container.emptySpace()) {
             final Point3f spacePosPoint = new Point3f(startPointer.x + translate(space.w_()),
                     startPointer.y + translate(space.h_()), startPointer.z + translate(space.l_()));
@@ -183,6 +184,8 @@ public class Draw3d<T extends Space> extends JPanel {
             // Color3f(rnd.nextFloat(),rnd.nextFloat(),rnd.nextFloat()),true));
 
         }
+
+        ///
         // if (container.getContainerEmptySpaceList() != null) {
         // for (CargoGroup space : container.getContainerEmptySpaceList()) {
 
