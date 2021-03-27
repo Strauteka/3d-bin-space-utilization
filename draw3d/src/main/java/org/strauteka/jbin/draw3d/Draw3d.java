@@ -106,7 +106,7 @@ public class Draw3d<T extends Space> extends JPanel {
         objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 
         for (Bin container : containers) {
-            System.out.println("Draw bin: " + container.toString());
+            // System.out.println("Draw bin: " + container.toString());
             drawContent(objRotate, container, startPointer); // getShape
             startPointer.x = (startPointer.x + translate(container.w()) + 0.1f);
         }
