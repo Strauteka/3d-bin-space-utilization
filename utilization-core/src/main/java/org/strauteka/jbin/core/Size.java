@@ -9,16 +9,14 @@ public class Size implements Dimension {
     private final int h;
     private final int w;
 
+    public Size(Dimension dimensions) {
+        this(dimensions.l(), dimensions.h(), dimensions.w());
+    }
+
     public Size(int l, int h, int w) {
         this.l = l;
         this.h = h;
         this.w = w;
-    }
-
-    public Size(Dimension dimensions) {
-        this.l = dimensions.l();
-        this.h = dimensions.h();
-        this.w = dimensions.w();
     }
 
     public int l() {
@@ -33,7 +31,6 @@ public class Size implements Dimension {
         return w;
     }
 
-    @Override
     public Size rotate(Rotation rotation) {
         switch (rotation) {
         case lhw:
@@ -50,6 +47,11 @@ public class Size implements Dimension {
             // lwh
             return new Size(l(), w(), h());
         }
+    }
+
+    @Override
+    public long value() {
+        return Long.valueOf(l()) * Long.valueOf(h()) * Long.valueOf(w());
     }
 
     public Size subtract(Dimension dimension) {

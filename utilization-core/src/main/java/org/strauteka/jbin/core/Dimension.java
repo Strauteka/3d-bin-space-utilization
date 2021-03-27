@@ -11,4 +11,6 @@ public interface Dimension {
     public int w();
 
     public Dimension rotate(Rotation rotation);
+
+    public long value();
 }

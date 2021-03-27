@@ -3,6 +3,8 @@ package org.strauteka.jbin.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.strauteka.jbin.core.configuration.StackConfig;
+
 public class Space extends Size {
 
     private final Size position;
@@ -63,11 +65,30 @@ public class Space extends Size {
                 Math.min(w__(), s.w__()) - Math.max(w_(), s.w_()));
     }
 
-    public boolean neighborLeftOrFront(Space s) {
+    public boolean needToExpand(Space s, StackConfig conf) {
         final Size os = overlapSize(s);
-        // System.out.println(this + "//" + s + "//" + os);
-        return this.w__() == s.w_() && os.l() > 0 || this.l__() == s.l_() && os.w() > 0;
+        final boolean w = this.w__() == s.w_() && os.l() > 0 && os.h() > 0
+                && ((h_() < s.h_() ? w() : s.w()) <= conf.w_() || h_() == s.h_());
+        final boolean l = this.l__() == s.l_() && os.w() > 0 && os.h() > 0
+                && ((h_() < s.h_() ? l() : s.l()) <= conf.l_() || h_() == s.h_());
+        return w || l;
     }
+
+    // public boolean neighborLeftOrFront(Space s) {
+    // final Size os = overlapSize(s);
+    // return (this.w__() == s.w_() && os.l() > 0 || this.l__() == s.l_() && os.w()
+    // > 0) && os.h() > 0;
+    // }
+
+    // public boolean neighborLeft(Space s) {
+    // final Size os = overlapSize(s);
+    // return this.w__() == s.w_() && os.l() > 0 && os.h() > 0;
+    // }
+
+    // public boolean neighborFront(Space s) {
+    // final Size os = overlapSize(s);
+    // return this.l__() == s.l_() && os.w() > 0 && os.h() > 0;
+    // }
 
     public List<Space> createSpace(Space cargo, boolean disableTop) {
         final List<Space> collector = new ArrayList<>();
@@ -118,27 +139,41 @@ public class Space extends Size {
         return collector;
     }
 
-    public List<Space> combineSpace(Space space) {
+    public List<Space> combineSpace(Space space, StackConfig conf) {
         final List<Space> collector = new ArrayList<>();
-        if (neighborLeftOrFront(space)) {
-            final Size os = overlapSize(space);
-            if (os.w() == 0 && os.l() > 0) {
-                final int h_ = Math.max(h_(), space.h_());
-                final int h__ = Math.min(h__(), space.h__());
-                final Space s = new Space(os.l(), (h__ - h_), w() + space.w(),
-                        new Size(Math.max(l_(), space.l_()), h_, w_()));
-                // System.out.println("width:" + this + "//" + space + "//" + s);
-                collector.add(s);
-            } else if (os.l() == 0 && os.w() > 0) {
-                final int h_ = Math.max(h_(), space.h_());
-                final int h__ = Math.min(h__(), space.h__());
-                final Space s = new Space(l() + space.l(), (h__ - h_), os.w(),
-                        new Size(l_(), h_, Math.max(w_(), space.w_())));
-                // System.out.println("len:" + this + "//\n" + space + "//\n" + s);
-                collector.add(s);
-            }
+        final Size os = overlapSize(space);
+        if (os.w() == 0 && os.l() > 0) {
+            final int h_ = Math.max(h_(), space.h_());
+            final int h__ = Math.min(h__(), space.h__());
+            final Space s = new Space(os.l(), (h__ - h_), expand(h_() - space.h_(), w(), space.w(), conf.w()), new Size(
+                    Math.max(l_(), space.l_()), h_, findPosition(h_() - space.h_(), w_(), space.w_(), conf.w())));
+            collector.add(s);
+        } else if (os.l() == 0 && os.w() > 0) {
+            final int h_ = Math.max(h_(), space.h_());
+            final int h__ = Math.min(h__(), space.h__());
+            final Space s = new Space(expand(h_() - space.h_(), l(), space.l(), conf.l()), (h__ - h_), os.w(), new Size(
+                    findPosition(h_() - space.h_(), l_(), space.l_(), conf.l()), h_, Math.max(w_(), space.w_())));
+            collector.add(s);
         }
         return collector;
+    }
+
+    private static int findPosition(int h, int pos1, int pos2, int maxExpand) {
+        if (h >= 0) {
+            return Math.min(pos1, pos2);
+        } else {
+            return Math.max(pos1, pos2) - Math.min(Math.abs(pos1 - pos2), maxExpand);
+        }
+    }
+
+    private static int expand(int h, int x1, int x2, int maxExpand) {
+        if (h == 0) {
+            return x1 + x2;
+        } else if (h < 0) {
+            return Math.min(x1, maxExpand) + x2;
+        } else {
+            return Math.min(x2, maxExpand) + x1;
+        }
     }
 
     @Override
