@@ -72,8 +72,8 @@ public class Space extends Size {
         final boolean l = this.l__() == s.l_() && os.w() > 0 && os.h() > 0
                 && ((h_() < s.h_() ? l() : s.l()) <= conf.l_() || h_() == s.h_());
         // Merging expanded space. Overlap exact config size
-        final boolean wx = os.w() == conf.w() && os.l() > 0 && os.h() > 0 && h_() == s.h_();
-        final boolean lx = os.l() == conf.l() && os.w() > 0 && os.h() > 0 && h_() == s.h_();
+        final boolean wx = os.w() > 0 && os.w() <= conf.w() && os.l() > 0 && os.h() > 0 && h_() == s.h_();
+        final boolean lx = os.l() > 0 && os.l() <= conf.l() && os.w() > 0 && os.h() > 0 && h_() == s.h_();
         return w || l || wx || lx;
     }
 
@@ -157,13 +157,15 @@ public class Space extends Size {
             final Space s = new Space(expand(h_() - space.h_(), l(), space.l(), conf.l()), (h__ - h_), os.w(), new Size(
                     findPosition(h_() - space.h_(), l_(), space.l_(), conf.l()), h_, Math.max(w_(), space.w_())));
             collector.add(s);
-        } else if (os.w() == conf.w() && os.l() > 0) { // Merging expanded space. Overlap exact config size
+        } else if (os.w() > 0 && os.w() <= conf.w() && os.l() > 0) { // Merging expanded space. Overlap exact config
+                                                                     // size
             final int h_ = Math.max(h_(), space.h_());
             final int h__ = Math.min(h__(), space.h__());
             final Space s = new Space(os.l(), (h__ - h_), w() + space.w() - os.w(),
                     new Size(Math.max(l_(), space.l_()), h_, Math.min(w_(), space.w_())));
             collector.add(s);
-        } else if (os.l() == conf.l() && os.w() > 0) { // Merging expanded space. Overlap exact config size
+        } else if (os.l() > 0 && os.l() <= conf.l() && os.w() > 0) { // Merging expanded space. Overlap exact config
+                                                                     // size
             final int h_ = Math.max(h_(), space.h_());
             final int h__ = Math.min(h__(), space.h__());
             final Space s = new Space(l() + space.l() - os.l(), (h__ - h_), os.w(),

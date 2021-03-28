@@ -13,8 +13,8 @@ public class Development {
 
     public static void draw() {
         List<Bin> bins = new ArrayList<>();
-        bins.add(test2());
-        bins.add(test3());
+        // bins.add(test2());
+        // bins.add(test3());
         bins.add(test4());
         Draw3d.draw(bins.toArray(new Bin[0]));
     }
@@ -52,7 +52,7 @@ public class Development {
         final Bin b = new Bin(new Size(1000, 700, 1000), new StackConfig(20, 1000, 20, 1000));
         final Cargo<Size> w = new Cargo<Size>(new Size(300, 200, 400), new Size(150, 0, 150));
         final Cargo<Size> x = new Cargo<Size>(new Size(200, 200, 300), new Size(200, 0, 550));
-        final Cargo<Size> y = new Cargo<Size>(new Size(200, 200, 200), new Size(450, 0, 150));
+        final Cargo<Size> y = new Cargo<Size>(new Size(200, 200, 200), new Size(480, 0, 150));
 
         b.add(x);
         b.add(y);
