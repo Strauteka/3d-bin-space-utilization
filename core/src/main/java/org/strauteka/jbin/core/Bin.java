@@ -72,8 +72,10 @@ public class Bin extends Size {
     private List<Space> mergeAll(List<Space> space) {
         final List<Space> mergedItems = merge(space);
         if (!mergedItems.isEmpty()) {
-            return mergeAll(
-                    dropOverlapSpace(Stream.concat(mergedItems.stream(), space.stream()).collect(Collectors.toList())));
+            return mergeAll(Stream
+                    .concat(mergedItems.stream(), space.stream().filter(
+                            e -> !mergedItems.stream().filter(x -> !e.equals(x) && x.overlay(e)).findAny().isPresent()))
+                    .collect(Collectors.toList()));
         } else {
             return space;
         }
