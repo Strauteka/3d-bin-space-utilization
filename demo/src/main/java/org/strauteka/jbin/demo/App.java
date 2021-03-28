@@ -9,6 +9,8 @@ public class App {
         Development.draw();
         // Demo.drawRotations();
         Demo.draw();
+        final long l = System.currentTimeMillis();
         Draw3d.draw(false, PackerEntry.calculate(2000, 3).toArray(new Bin[0]));
+        System.out.println("Calc time: " + (System.currentTimeMillis() - l));
     }
 }

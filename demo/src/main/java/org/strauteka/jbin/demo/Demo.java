@@ -117,7 +117,7 @@ public class Demo {
     }
 
     public static Bin test8() {
-        final Bin b = new Bin(new Size(1000, 1000, 1000), new StackConfig(20, 1000, 20, 1000));
+        final Bin b = new Bin(new Size(1000, 1000, 1000), new StackConfig(50, 1000, 50, 1000, 50));
         final Cargo<Size> w = new Cargo<Size>(new Size(300, 200, 400), new Size(150, 0, 150));
         final Cargo<Size> x = new Cargo<Size>(new Size(200, 200, 300), new Size(200, 0, 550));
         final Cargo<Size> y = new Cargo<Size>(new Size(200, 200, 200), new Size(450, 0, 150));

@@ -60,10 +60,9 @@ public class PackerUnit {
 
     private static Optional<Space> selectSpace(List<Space> spaces, List<Tuple2<Item, Integer>> itemUtilize) {
         // filter off spaces that can't fit any item
-        final List<Space> validSpaces = spaces.stream()
-                .filter(e -> itemUtilize.stream().filter(x -> e.fitAny(x._1)).findAny().isPresent())
-                .collect(Collectors.toList());
-        return selectSpace(validSpaces);
+        return selectSpace(
+                spaces.stream().filter(e -> itemUtilize.stream().filter(x -> e.fitAny(x._1)).findAny().isPresent())
+                        .collect(Collectors.toList()));
     }
 
     private static Optional<Space> selectSpace(List<Space> validSpaces) {

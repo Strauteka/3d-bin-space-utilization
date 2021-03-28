@@ -3,6 +3,7 @@ package org.strauteka.jbin.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,7 +21,7 @@ public class Bin extends Size {
     }
 
     public Bin(Dimension size) {
-        this(size, new StackConfig(0, 0, 0, 0));
+        this(size, new StackConfig(0, 0, 0, 0, 0));
     }
 
     public Bin(Dimension size, StackConfig overStack) {
@@ -35,7 +36,7 @@ public class Bin extends Size {
 
     public void add(Cargo<? extends Size> cargo, boolean disableTop) {
         this.cargo.add(cargo);
-        this.space = mergeAll(dropOverlapSpace(createSpace(space, cargo, disableTop)), 0);
+        this.space = dropUnusableSpace(mergeAll(dropOverlapSpace(createSpace(space, cargo, disableTop))));
     }
 
     private List<Space> createSpace(List<Space> space, Cargo<? extends Size> cargo, boolean disableTop) {
@@ -51,6 +52,11 @@ public class Bin extends Size {
                 .collect(Collectors.toList());
     }
 
+    private List<Space> dropUnusableSpace(final List<Space> space) {
+        return space.stream().filter(e -> Math.min(Math.min(e.l(), e.h()), e.w()) > stackConfig.minimumSpaceSide())
+                .collect(Collectors.toList());
+    }
+
     public List<Space> emptySpace() {
         return Collections.unmodifiableList(space);
     }
@@ -63,15 +69,11 @@ public class Bin extends Size {
         return stackConfig;
     }
 
-    // int i for
-    private List<Space> mergeAll(List<Space> space, int i) {
+    private List<Space> mergeAll(List<Space> space) {
         final List<Space> mergedItems = merge(space);
-        // System.out.println(mergedItems.size());
-        // mergedItems.stream().forEach(System.out::println);
         if (!mergedItems.isEmpty()) {
             return mergeAll(
-                    dropOverlapSpace(Stream.concat(mergedItems.stream(), space.stream()).collect(Collectors.toList())),
-                    i + 1);
+                    dropOverlapSpace(Stream.concat(mergedItems.stream(), space.stream()).collect(Collectors.toList())));
         } else {
             return space;
         }
@@ -80,15 +82,9 @@ public class Bin extends Size {
     private List<Space> merge(List<Space> space) {
         return space.stream().map(e -> space.stream()//
                 .filter(x -> !e.equals(x))//
-                .filter(x -> e.needToExpand(x, stackConfig))//
-                // .filter(x -> e.neighborLeftOrFront(x))//
-                // .filter(x -> e.h_() == x.h_() || // //expand even height
-                // (e.h_() < x.h_() ? e.w() : x.w()) <= stackConfig.w_() && e.neighborLeft(x) ||
-                // // overstack W
-                // (e.h_() < x.h_() ? e.l() : x.l()) <= stackConfig.l_() &&
-                // e.neighborFront(x))// overstack L
-                .map(x -> e.combineSpace(x, stackConfig)).flatMap(x -> x.stream())).flatMap(e -> e)
-                .filter(e -> !space.stream().filter(x -> e.equals(x) || x.overlay(e)).findAny().isPresent()).distinct()
+                .filter(x -> e.needToCombineSpace(x, stackConfig))//
+                .map(x -> e.combineSpace(x, stackConfig)).filter(Objects::nonNull)).flatMap(e -> e).distinct()
+                .filter(e -> !space.stream().filter(x -> e.equals(x) || x.overlay(e)).findAny().isPresent())
                 .collect(Collectors.toList());
     }
 

@@ -23,6 +23,8 @@ Notes:
 
 - In `Bin`, `Cargo` rotates at most on six positions / sides.
   ![draw-demo1.jpg](./resources/draw-demo2.png)
+
+-
 - Detailed info - Run demo code.
 
 # Usage
@@ -44,10 +46,17 @@ Over-stack space
 
 ## Preview demo algorithm
 
-5 types of items.
+### 5 types of items.
+
 ![draw-demo3.jpg](./resources/draw-demo3.png)
-20 types of items.
+
+### 20 types of items.
+
 ![draw-demo1.jpg](./resources/draw-demo1.png)
+
+### 50 types of items.
+
+![draw-demo1.jpg](./resources/draw-demo5.png)
 
 ## Problems with `java3d` libraries?
 

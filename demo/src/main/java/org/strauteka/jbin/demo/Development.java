@@ -20,7 +20,7 @@ public class Development {
     }
 
     public static Bin test3() {
-        final Bin b = new Bin(new Size(1000, 1000, 1000), new StackConfig(20, 50, 20, 50));
+        final Bin b = new Bin(new Size(1000, 1000, 1000), new StackConfig(20, 50, 20, 50, 50));
         final Cargo<Size> w = new Cargo<Size>(new Size(900, 200, 900), new Size(50, 0, 50));
         b.add(w);
         // b.add(xx);
@@ -49,7 +49,7 @@ public class Development {
     }
 
     public static Bin test4() {
-        final Bin b = new Bin(new Size(1000, 700, 1000), new StackConfig(20, 1000, 20, 1000));
+        final Bin b = new Bin(new Size(1000, 700, 1000), new StackConfig(20, 1000, 20, 1000, 0));
         final Cargo<Size> w = new Cargo<Size>(new Size(300, 200, 400), new Size(150, 0, 150));
         final Cargo<Size> x = new Cargo<Size>(new Size(200, 200, 300), new Size(200, 0, 550));
         final Cargo<Size> y = new Cargo<Size>(new Size(200, 200, 200), new Size(480, 0, 150));

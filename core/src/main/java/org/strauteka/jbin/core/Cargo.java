@@ -21,7 +21,11 @@ public class Cargo<T extends Size> extends Space {
     }
 
     public Cargo(T ref, int l, int h, int w, Rotation rotate, Dimension position) {
-        super(new Size(ref.rotate(rotate).l() * l, ref.rotate(rotate).h() * h, ref.rotate(rotate).w() * w), position);
+        this(ref, l, h, w, rotate, ref.rotate(rotate), position);
+    }
+
+    private Cargo(T ref, int l, int h, int w, Rotation rotate, Dimension rotatedRef, Dimension position) {
+        super(rotatedRef.l() * l, rotatedRef.h() * h, rotatedRef.w() * w, position);
         this.stack = new Size(l, h, w);
         this.cargo = ref;
         this.rotate = rotate;

@@ -64,8 +64,8 @@ public class PackerEntry {
         List<Bin> collector = new ArrayList<>();
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
-        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100)));
-        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100)));
+        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100)));
+        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100)));
         return collector;
     }
 
