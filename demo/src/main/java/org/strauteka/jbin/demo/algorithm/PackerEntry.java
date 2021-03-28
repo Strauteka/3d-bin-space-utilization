@@ -1,10 +1,21 @@
 package org.strauteka.jbin.demo.algorithm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Size;
@@ -25,38 +36,29 @@ public class PackerEntry {
         for (Bin bin : bins) {
             final long ItemSpace = itemsUtil.stream().map(e -> e._1.value() * (e._1.qty() - e._2)).reduce(0l,
                     Long::sum);
-            System.out.println("Starting rat-race for Bin:" + bin);
+            System.out.println("Starting rat-race for Bin:" + bin + "\nCalculation Items:"
+                    + (Double.valueOf(ItemSpace) / Double.valueOf(bin.value())) + "%");
             Tuple2<Bin, List<Tuple2<Item, Integer>>> tmp = PackerParallel.calculate(iterations, calcSec, bin,
                     itemsUtil);
-            // Todo: deepDive in bin!
-            long cargoSpace = tmp._1.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum);
-
-            System.out.println("Calculation:: " + (Double.valueOf(cargoSpace) / Double.valueOf(bin.value()))
-                    + "% Items:" + (Double.valueOf(ItemSpace) / Double.valueOf(bin.value())) + "%");
             binCollector.add(tmp._1);
             itemsUtil = tmp._2;
         }
-        // todo: overview analytic functions!
-        // long ItemSpace = items.stream()
-        // .map(e -> Long.valueOf(e.l()) * Long.valueOf(e.h()) * Long.valueOf(e.w()) *
-        // e.qty)
-        // .reduce(0l, Long::sum);
 
-        // result.get(0)._1.stream().map(e -> e.cargo()).flatMap(e -> e.stream())
-        // .collect(Collectors.groupingBy(e -> e.cargo(),
-        // Collectors.counting())).entrySet().stream()
-        // .forEach(System.out::println);
+        for (Bin bin : binCollector) {
+            // Todo: deepDive in bin!
+            long cargoSpace = bin.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum);
+            System.out.println("Items added to bins: " + bin + " || "
+                    + (Double.valueOf(cargoSpace) / Double.valueOf(bin.value())) + "%");
+            bin.cargo().stream().map(e -> new Tuple2<>((Item) e.cargo(), e.stack().value()))
+                    .collect(Collectors.groupingBy(e -> e._1, collector))//
+                    .entrySet().stream().map(e -> new Tuple2<Item, Long>(e.getKey(), e.getValue().get(e.getKey())))
+                    .forEach(e -> System.out
+                            .println(e._1 + " -- " + e._1.qty() + " || " + e._2 + " :: " + (e._1.qty() - e._2)));
+        }
 
-        // long cargoSpace = result.get(0)._1.stream().map(e -> e.cargo().stream()
-        // .map(x -> Long.valueOf(x.l()) * Long.valueOf(x.h()) *
-        // Long.valueOf(x.w())).reduce(0l, Long::sum))
-        // .reduce(0l, Long::sum);
-
-        // System.out.println("Calculation: " + "x" + " :: " +
-        // (Double.valueOf(cargoSpace) / Double.valueOf(fullSpace))
-        // + "% Items:" + (Double.valueOf(ItemSpace) / Double.valueOf(fullSpace)) +
-        // "%");
-
+        System.out.println("Items Left:");
+        itemsUtil.stream().filter(e -> e._1.qty() > e._2).forEach(
+                e -> System.out.println(e._1 + " -- " + e._1.qty() + " || " + e._2 + " :: " + (e._1.qty() - e._2)));
         return binCollector;
     }
 
@@ -94,4 +96,33 @@ public class PackerEntry {
     private static int itemSize(int boundMin, int boundMax, Random rnd) {
         return boundMin + rnd.nextInt(boundMax - boundMin);
     }
+
+    // some epic code, need to learn analytic functions :/
+    private static final Collector<Tuple2<Item, Long>, Map<Item, Long>, Map<Item, Long>> collector = new Collector<Tuple2<Item, Long>, Map<Item, Long>, Map<Item, Long>>() {
+        @Override
+        public Supplier<Map<Item, Long>> supplier() {
+            return HashMap::new;
+        }
+
+        @Override
+        public BiConsumer<Map<Item, Long>, Tuple2<Item, Long>> accumulator() {
+            return (Map<Item, Long> t, Tuple2<Item, Long> u) -> t.merge(u._1, u._2, (o1, o2) -> o1 + o2);
+        }
+
+        @Override
+        public BinaryOperator<Map<Item, Long>> combiner() {
+            return (Map<Item, Long> t, Map<Item, Long> u) -> Stream.concat(t.entrySet().stream(), u.entrySet().stream())
+                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (Long o1, Long o2) -> o1 + o2));
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            return new HashSet<>(Arrays.asList(Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH));
+        }
+
+        @Override
+        public Function<Map<Item, Long>, Map<Item, Long>> finisher() {
+            return Function.identity();
+        }
+    };
 }
