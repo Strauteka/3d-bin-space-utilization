@@ -24,8 +24,9 @@ Notes:
 - In `Bin`, `Cargo` rotates at most on six positions / sides.
   ![draw-demo1.jpg](./resources/draw-demo2.png)
 
--
-- Detailed info - Run demo code.
+- Detailed info
+  - Run demo code.
+  - View demo algorithm: https://github.com/Strauteka/3d-bin-space-utilization/blob/main/demo/src/main/java/org/strauteka/jbin/demo/algorithm PackerEntry.java class
 
 # Usage
 
@@ -39,9 +40,12 @@ Notes:
 
 ## Preview core
 
+### Empty space determination
+
 ![draw-demo.jpg](./resources/draw-demo.png)
 
-Over-stack space
+### Over-stack space
+
 ![draw-demo4.jpg](./resources/draw-demo4.png)
 
 ## Preview demo algorithm

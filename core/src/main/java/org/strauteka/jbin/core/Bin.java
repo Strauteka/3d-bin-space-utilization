@@ -13,7 +13,7 @@ import org.strauteka.jbin.core.configuration.StackConfig;
 public class Bin extends Size {
     private final StackConfig stackConfig;
     private final List<Cargo<? extends Size>> cargo = new ArrayList<Cargo<?>>();
-    List<Space> space = new ArrayList<Space>();
+    private List<Space> space = new ArrayList<Space>();
 
     public Bin(Bin bin) {
         this(bin, bin.stackConfig());
@@ -73,8 +73,9 @@ public class Bin extends Size {
         final List<Space> mergedItems = merge(space);
         if (!mergedItems.isEmpty()) {
             return mergeAll(Stream
-                    .concat(mergedItems.stream(), space.stream().filter(
-                            e -> !mergedItems.stream().filter(x -> !e.equals(x) && x.overlay(e)).findAny().isPresent()))
+                    .concat(mergedItems.stream(),
+                            space.stream()
+                                    .filter(e -> !mergedItems.stream().filter(x -> x.overlay(e)).findAny().isPresent()))
                     .collect(Collectors.toList()));
         } else {
             return space;
@@ -86,7 +87,7 @@ public class Bin extends Size {
                 .filter(x -> !e.equals(x))//
                 .filter(x -> e.needToCombineSpace(x, stackConfig))//
                 .map(x -> e.combineSpace(x, stackConfig)).filter(Objects::nonNull)).flatMap(e -> e).distinct()
-                .filter(e -> !space.stream().filter(x -> e.equals(x) || x.overlay(e)).findAny().isPresent())
+                .filter(e -> !space.stream().filter(x -> x.overlay(e)).findAny().isPresent())
                 .collect(Collectors.toList());
     }
 
