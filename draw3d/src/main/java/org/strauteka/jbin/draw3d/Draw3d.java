@@ -14,9 +14,15 @@ import org.strauteka.jbin.core.Space;
 
 import java.awt.BorderLayout;
 import java.awt.GraphicsConfiguration;
+import java.awt.Color;
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.media.j3d.Appearance;
@@ -46,13 +52,8 @@ import javax.vecmath.Point3f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
-/**
- * Old code! GOD, forgive me!
- * 
- * @author JanisSTR
- */
 public class Draw3d<T extends Space> extends JPanel {
-
+    private final Map<Dimension, Color3f> colors;
     /**
      *
      */
@@ -65,7 +66,12 @@ public class Draw3d<T extends Space> extends JPanel {
      * Fill your 3D world with content
      */
 
-    public Draw3d(List<Bin> containers, javax.vecmath.Point3f myPointer, boolean skipEmptySpace) {
+    public Draw3d(List<Bin> containers, javax.vecmath.Point3f myPointer, boolean skipEmptySpace, boolean skipBin,
+            Map<Dimension, Color> colors) {
+
+        this.colors = Optional.ofNullable(colors).orElseGet(() -> new HashMap<Dimension, Color>()).entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(), e -> new Color3f(e.getValue().getRed() / 255f,
+                        e.getValue().getGreen() / 255f, e.getValue().getBlue() / 255f)));
 
         Point3f startPointer = new Point3f(myPointer.x, myPointer.y, myPointer.z);
 
@@ -75,8 +81,7 @@ public class Draw3d<T extends Space> extends JPanel {
         add("Center", canvas3D);
 
         BranchGroup scene = new BranchGroup();
-        ////
-        // set white font
+
         Background background = new Background(new Color3f(0.3f, 0.3f, 0.3f));
         BoundingSphere sphere = new BoundingSphere(new Point3d(0, 0, 0), 100000);
         background.setApplicationBounds(sphere);
@@ -106,12 +111,11 @@ public class Draw3d<T extends Space> extends JPanel {
         objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 
         for (Bin container : containers) {
-            // System.out.println("Draw bin: " + container.toString());
-            drawContent(objRotate, container, startPointer, skipEmptySpace); // getShape
-            startPointer.x = (startPointer.x + translate(container.w()) + 0.1f);
+            drawContent(objRotate, container, startPointer, skipEmptySpace, skipBin); // getShape
+            startPointer.x = (startPointer.x + translate(container.w()) + 0.2f);
         }
 
-        // objRotate.addChild(draw3DLine()); dimensiju virzieni!
+        // objRotate.addChild(draw3DLine());
         // mouserotate
         MouseRotate mouseRotate = new MouseRotate();
         mouseRotate.setSchedulingBounds(new BoundingSphere());
@@ -119,13 +123,11 @@ public class Draw3d<T extends Space> extends JPanel {
 
         scene.addChild(mouseRotate);
 
-        // nesaprotu!
         MouseTranslate translate = new MouseTranslate();
         translate.setTransformGroup(objRotate);
         translate.setSchedulingBounds(new BoundingSphere());
         scene.addChild(translate);
 
-        // mousezoom //dafuq MouseZoom ?
         MouseWheelZoom mouseZoom = new MouseWheelZoom();// zoom MouseBehavior.INVERT_INPUT
         mouseZoom.setSchedulingBounds(new BoundingSphere());
         mouseZoom.setTransformGroup(objRotate);
@@ -143,16 +145,20 @@ public class Draw3d<T extends Space> extends JPanel {
         simpleU.addBranchGraph(scene);
     }
 
-    private void drawBox(TransformGroup objRotate, Cargo<?> content, Point3f posPointer, boolean skipEmptySpace) {
+    private void drawBox(TransformGroup objRotate, Cargo<? extends Dimension> content, Point3f posPointer,
+            boolean skipEmptySpace, boolean skipBin) {
         if (content.cargo() instanceof Bin) {
-            drawContent(objRotate, ((Bin) content.cargo()).binTurn(content.rotation()), posPointer, skipEmptySpace);
+            drawContent(objRotate, ((Bin) content.cargo()).binRotate(content.rotation()), posPointer, skipEmptySpace,
+                    skipBin);
         } else {
             final Dimension size = content.cargo().rotate(content.rotation());
             final Dimension stack = content.stack();
             Random rnd = new Random();
-            final Color3f col = new Color3f(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat());
-            IntStream.rangeClosed(1, stack.l()).forEach(l -> IntStream.rangeClosed(1, stack.h()).forEach(h -> IntStream
-                    .rangeClosed(1, stack.w()).forEach(w -> createBox(objRotate, posPointer, col, l, h, w, size))));
+            colors.merge(content.cargo(), new Color3f(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat()),
+                    (o1, o2) -> o1);
+            IntStream.rangeClosed(1, stack.l()).forEach(
+                    l -> IntStream.rangeClosed(1, stack.h()).forEach(h -> IntStream.rangeClosed(1, stack.w()).forEach(
+                            w -> createBox(objRotate, posPointer, colors.get(content.cargo()), l, h, w, size))));
         }
     }
 
@@ -164,43 +170,26 @@ public class Draw3d<T extends Space> extends JPanel {
         objRotate.addChild(draw3DRectangle(posPointer, size, col, false));
     }
 
-    private void drawContent(TransformGroup objRotate, Bin container, Point3f startPointer, boolean skipEmptySpace) {
-        objRotate.addChild(draw3DRectangleLine(startPointer, container, new Color3f(0.0f, 0.0f, 0.0f)));
-        for (Cargo<?> cargo : container.cargo()) {
+    private void drawContent(TransformGroup objRotate, Bin bin, Point3f startPointer, boolean skipEmptySpace,
+            boolean skipBin) {
+        if (!skipBin) {
+            objRotate.addChild(draw3DRectangleLine(startPointer, bin, new Color3f(0.0f, 0.0f, 0.0f)));
+        }
+        for (Cargo<? extends Dimension> cargo : bin.cargo()) {
             final Point3f cargoPosPoint = new Point3f(startPointer.x + translate(cargo.w_()),
                     startPointer.y + translate(cargo.h_()), startPointer.z + translate(cargo.l_()));
-            drawBox(objRotate, cargo, cargoPosPoint, skipEmptySpace);
+            drawBox(objRotate, cargo, cargoPosPoint, skipEmptySpace, skipBin);
         }
         if (!skipEmptySpace) {
-            for (Space space : container.emptySpace()) {
+            for (Space space : bin.emptySpace()) {
                 final Point3f spacePosPoint = new Point3f(startPointer.x + translate(space.w_()),
                         startPointer.y + translate(space.h_()), startPointer.z + translate(space.l_()));
                 Random rnd = new Random();
-                // if (space.getPositionPoint().getHeight()== 0) {
                 Color3f col = new Color3f(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat());
                 objRotate.addChild(draw3DRectangleLine(spacePosPoint, space, col));
                 objRotate.addChild(draw3DPoint(spacePosPoint, col));
-                // objRotate.addChild(draw3DRectangle(posPointer, space.getSize(), new
-                // Color3f(rnd.nextFloat(),rnd.nextFloat(),rnd.nextFloat()),true));
-
             }
         }
-
-        ///
-        // if (container.getContainerEmptySpaceList() != null) {
-        // for (CargoGroup space : container.getContainerEmptySpaceList()) {
-
-        // posPointer.x = startPointer.x + space.getPositionPoint().getWidthF();
-        // posPointer.y = startPointer.y + space.getPositionPoint().getHeightF();
-        // posPointer.z = startPointer.z + space.getPositionPoint().getLengthF();
-        // Random rnd = new Random();
-        // Color3f col = new Color3f(0, 0, 0);
-        // objRotate.addChild(draw3DRectangleLine(posPointer, space.getSize(), col));
-        // objRotate.addChild(draw3DRectangle(posPointer, space.getSize(), new
-        // Color3f(1, 0.5f, 0), true));
-
-        // }
-        // }
     }
 
     public Shape3D draw3DRectangleLine(Point3f position, Dimension size, Color3f color3f) {
@@ -465,18 +454,19 @@ public class Draw3d<T extends Space> extends JPanel {
     }
 
     public static void draw(Bin... b) {
-        draw(false, b);
+        draw(false, false, 1200, 800, null, b);
     }
 
-    public static void draw(boolean skipEmptySpace, Bin... b) {
+    public static void draw(boolean skipEmptySpace, boolean skipBin, int frameW, int frameL,
+            Map<Dimension, Color> colors, Bin... b) {
         List<Bin> con = Arrays.asList(b);
         javax.vecmath.Point3f startPointer3D = new Point3f(
                 -(translate(con.get(0).w()) * con.size() + (con.size() - 1) * 0.1f) / 2, -translate(con.get(0).h()) / 2,
                 -translate(con.get(0).l()) / 2);
 
         JFrame frame = new JFrame();
-        frame.add(new JScrollPane(new Draw3d<Space>(con, startPointer3D, skipEmptySpace)));
-        frame.setSize(1200, 800);
+        frame.add(new JScrollPane(new Draw3d<Space>(con, startPointer3D, skipEmptySpace, skipBin, colors)));
+        frame.setSize(frameW, frameL);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }

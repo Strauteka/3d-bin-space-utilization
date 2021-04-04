@@ -21,41 +21,39 @@ public class PackerUnit {
         // System.out.println(
         // "Current Thread Name- " + Thread.currentThread().getName() + " :: " +
         // Thread.currentThread().getId());
-        if (atomicStop.get()) {
+        if (atomicStop.get())
             return new Tuple2<Bin, List<Tuple2<Item, Integer>>>(bin, items);
-        } else {
-            return packRecursive(new Bin(bin), items);
-        }
+
+        return packRecursive(new Bin(bin), items);
     }
 
     private static Tuple2<Bin, List<Tuple2<Item, Integer>>> packRecursive(Bin bin,
             List<Tuple2<Item, Integer>> itemUtilize) {
         final Optional<Cargo<? extends Size>> optCargo = findCargo(bin.emptySpace(),
                 itemUtilize.stream().filter(e -> e._1.qty() > e._2).collect(Collectors.toList()));
-        if (optCargo.isPresent()) {
-            final Cargo<? extends Size> cargo = optCargo.get();
-            bin.add(cargo);
-            final Item cargoItem = (Item) cargo.cargo();
-            final List<Tuple2<Item, Integer>> next = Stream
-                    .concat(itemUtilize.stream().filter(e -> !e._1.equals(cargoItem)), //
-                            itemUtilize.stream().filter(e -> e._1.equals(cargoItem))
-                                    .map(e -> new Tuple2<>(e._1, e._2 + (int) cargo.stack().value())))
-                    .collect(Collectors.toList());
-            return packRecursive(bin, next);
-        } else {
+
+        if (!optCargo.isPresent())
             return new Tuple2<Bin, List<Tuple2<Item, Integer>>>(bin, itemUtilize);
-        }
+
+        final Cargo<? extends Size> cargo = optCargo.get();
+        bin.add(cargo);
+        final Item cargoItem = (Item) cargo.cargo();
+        final List<Tuple2<Item, Integer>> next = Stream
+                .concat(itemUtilize.stream().filter(e -> !e._1.equals(cargoItem)), //
+                        itemUtilize.stream().filter(e -> e._1.equals(cargoItem))
+                                .map(e -> new Tuple2<>(e._1, e._2 + (int) cargo.stack().value())))
+                .collect(Collectors.toList());
+        return packRecursive(bin, next);
     }
 
     private static Optional<Cargo<? extends Size>> findCargo(List<Space> spaces,
             List<Tuple2<Item, Integer>> itemUtilize) {
         // looping through all spaces is time consuming...
         final Optional<Space> space = selectSpace(spaces, itemUtilize);
-        if (space.isPresent()) {
+        if (space.isPresent())
             return createCargo(space.get(), itemUtilize);
-        } else {
-            return Optional.empty();
-        }
+
+        return Optional.empty();
     }
 
     private static Optional<Space> selectSpace(List<Space> spaces, List<Tuple2<Item, Integer>> itemUtilize) {
@@ -66,26 +64,22 @@ public class PackerUnit {
     }
 
     private static Optional<Space> selectSpace(List<Space> validSpaces) {
-        if (validSpaces.size() > 0) {
-            if (random(0, 2) == 0) {
-                return Optional.of(validSpaces.get(random(0, validSpaces.size() - 1)));
-            } else {
-                return validSpaces.stream().sorted(Comparator.comparingInt(e -> e.h_())).findFirst();
-            }
-        } else {
+        if (validSpaces.isEmpty())
             return Optional.empty();
-        }
+        if (random(0, 2) == 0)
+            return Optional.of(validSpaces.get(random(0, validSpaces.size() - 1)));
+
+        return validSpaces.stream().sorted(Comparator.comparingInt(e -> e.h_())).findFirst();
     }
 
     private static Optional<Cargo<? extends Size>> createCargo(Space space, List<Tuple2<Item, Integer>> itemUtilize) {
         final List<Cargo<? extends Size>> cargo = itemUtilize.stream().map(e -> createCargo(space, e._1, e._2))
                 .flatMap(e -> e.stream()).collect(Collectors.toList());
-        if (random(0, 2) == 0) {
+        if (random(0, 2) == 0)
             return Optional.of(cargo.get(random(0, cargo.size() - 1)));
-        } else {
-            return cargo.stream().sorted(Comparator.comparingInt(e -> (space.l() * space.w()) - (e.l() * e.w())))
-                    .findFirst();
-        }
+
+        return cargo.stream().sorted(Comparator.comparingInt(e -> (space.l() * space.w()) - (e.l() * e.w())))
+                .findFirst();
     }
 
     private static List<Cargo<? extends Size>> createCargo(Space space, Item item, Integer qty) {
@@ -95,13 +89,12 @@ public class PackerUnit {
 
     private static Cargo<? extends Size> buildCargoSwitch(Space space, Item item, Integer qtyUsed, Rotation rotation) {
         int rndSwitch = random(0, 4);
-        if (rndSwitch == 0) {
+        if (rndSwitch == 0)
             return buildCargoA(space, item, (item.qty() - qtyUsed), rotation);
-        } else if (rndSwitch == 1) {
+        if (rndSwitch == 1)
             return buildCargoB(space, item, (item.qty() - qtyUsed), rotation);
-        } else {
-            return buildCargoC(space, item, (item.qty() - qtyUsed), rotation);
-        }
+
+        return buildCargoC(space, item, (item.qty() - qtyUsed), rotation);
     }
 
     private static Cargo<? extends Size> buildCargoC(Space space, Item item, Integer qtyLeft, Rotation rotation) {
@@ -141,10 +134,9 @@ public class PackerUnit {
     }
 
     private static int randomReduce(int input) {
-        if (input > 1 && random(0, 2) == 0) {
+        if (input > 1 && random(0, 2) == 0)
             return (input - 1);
-        } else {
-            return input;
-        }
+
+        return input;
     }
 }

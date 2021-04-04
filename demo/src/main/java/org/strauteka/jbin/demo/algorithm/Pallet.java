@@ -1,4 +1,9 @@
-package org.strauteka.jbin.core;
+package org.strauteka.jbin.demo.algorithm;
+
+import org.strauteka.jbin.core.Bin;
+import org.strauteka.jbin.core.Cargo;
+import org.strauteka.jbin.core.Dimension;
+import org.strauteka.jbin.core.Size;
 
 public class Pallet extends Bin {
     private Bin palletBin;

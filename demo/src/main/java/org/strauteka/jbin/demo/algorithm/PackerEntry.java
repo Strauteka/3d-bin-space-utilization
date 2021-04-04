@@ -66,8 +66,8 @@ public class PackerEntry {
         List<Bin> collector = new ArrayList<>();
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
-        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100)));
-        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100)));
+        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100, false)));
         return collector;
     }
 
@@ -75,9 +75,19 @@ public class PackerEntry {
         List<Item> collector = new ArrayList<>();
         collector.add(new Item(400, 500, 1000, 10));
         collector.add(new Item(567, 532, 538, 10));
-        collector.add(new Item(359, 265, 129, 200));
-        collector.add(new Item(760, 300, 450, 200));
-        collector.add(new Item(300, 300, 300, 200));
+        collector.add(new Item(359, 265, 129, 50));
+        collector.add(new Item(760, 300, 450, 50));
+        collector.add(new Item(300, 300, 300, 50));
+        collector.add(new Item(400, 500, 1600, 10));
+        collector.add(new Item(567, 532, 538, 10));
+        collector.add(new Item(339, 264, 175, 50));
+        collector.add(new Item(760, 300, 450, 50));
+        collector.add(new Item(360, 380, 350, 50));
+        collector.add(new Item(400, 503, 1020, 10));
+        collector.add(new Item(567, 532, 538, 10));
+        collector.add(new Item(359, 265, 15, 50));
+        collector.add(new Item(760, 304, 430, 50));
+        collector.add(new Item(300, 650, 345, 50));
         return collector;
     }
 

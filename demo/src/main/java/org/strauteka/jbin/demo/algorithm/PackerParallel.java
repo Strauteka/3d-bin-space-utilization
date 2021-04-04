@@ -32,8 +32,8 @@ public class PackerParallel {
                 .mapToObj(e -> PackerUnit.pack(bin, items, atomicStop, e)).sorted(sortMaxFirstLowestSecond)
                 .collect(Collectors.toList());
         // dbg
-        // result.forEach(c -> System.out.println(c._1.cargo().stream().mapToInt(x ->
-        // x.h__()).max().orElse(0)));
+        System.out.println(
+                "Bin calculations: " + result.stream().map(e -> !e._1.cargo().isEmpty()).filter(e -> e).count());
         scheduledFuture.cancel(true);
         return result.get(0);
     }
@@ -43,13 +43,12 @@ public class PackerParallel {
         public int compare(Tuple2<Bin, List<Tuple2<Item, Integer>>> o1, Tuple2<Bin, List<Tuple2<Item, Integer>>> o2) {
             final long max = o2._1.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum)
                     - o1._1.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum);
-            if (max == 0) {
-                final int h = o1._1.cargo().stream().mapToInt(x -> x.h__()).max().orElse(0)
-                        - o2._1.cargo().stream().mapToInt(x -> x.h__()).max().orElse(0);
-                return (int) h > 0 ? 1 : (h < 0 ? -1 : 0);
-            } else {
+            if (max != 0)
                 return max > 0 ? 1 : (max < 0 ? -1 : 0);
-            }
+
+            final int h = o1._1.cargo().stream().mapToInt(x -> x.h__()).max().orElse(0)
+                    - o2._1.cargo().stream().mapToInt(x -> x.h__()).max().orElse(0);
+            return (int) h > 0 ? 1 : (h < 0 ? -1 : 0);
         }
     };
 }

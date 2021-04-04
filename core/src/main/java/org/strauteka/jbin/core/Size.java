@@ -69,14 +69,13 @@ public class Size implements Dimension {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
+        if (o == this)
             return true;
-        }
-        if (!(o instanceof Size)) {
+
+        if (!(o instanceof Size))
             return false;
-        } else {
-            return l == ((Size) o).l() && h == ((Size) o).h() && w == ((Size) o).w();
-        }
+
+        return l == ((Size) o).l() && h == ((Size) o).h() && w == ((Size) o).w();
     }
 
     @Override

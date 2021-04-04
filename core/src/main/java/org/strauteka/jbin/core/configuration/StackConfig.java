@@ -12,13 +12,16 @@ public class StackConfig {
     // filters off not usable space, if one of dimensions is less than this
     // parameter. Helps core to work a lot faster.
     private final int minimumSpaceSide;
+    // disable merging same height area, including over-stacking
+    private final boolean disableMerge;
 
-    public StackConfig(int l, int l_, int w, int w_, int minimumSpaceSide) {
+    public StackConfig(int l, int l_, int w, int w_, int minimumSpaceSide, boolean disableMerge) {
         this.l = l;
         this.l_ = l_;
         this.w = w;
         this.w_ = w_;
         this.minimumSpaceSide = minimumSpaceSide;
+        this.disableMerge = disableMerge;
     }
 
     public int l() {
@@ -39,5 +42,9 @@ public class StackConfig {
 
     public int minimumSpaceSide() {
         return this.minimumSpaceSide;
+    }
+
+    public boolean disableMerge() {
+        return this.disableMerge;
     }
 }

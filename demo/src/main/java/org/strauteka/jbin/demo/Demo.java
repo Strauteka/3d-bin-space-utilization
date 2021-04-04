@@ -1,14 +1,17 @@
 package org.strauteka.jbin.demo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.awt.Color;
 import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
-import org.strauteka.jbin.core.Pallet;
+import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.Utils.Rotation;
 import org.strauteka.jbin.core.configuration.StackConfig;
+import org.strauteka.jbin.demo.algorithm.Pallet;
 import org.strauteka.jbin.draw3d.Draw3d;
 
 public class Demo {
@@ -48,7 +51,9 @@ public class Demo {
         bins.add(b4);
         bins.add(b5);
         bins.add(b6);
-        Draw3d.draw(true, bins.toArray(new Bin[0]));
+        Map<Dimension, Color> colors = new HashMap<>();
+        colors.put(s, new Color(100, 100, 100));
+        Draw3d.draw(true, false, 1200, 800, colors, bins.toArray(new Bin[0]));
     }
 
     public static Bin test3() {
@@ -117,7 +122,7 @@ public class Demo {
     }
 
     public static Bin test8() {
-        final Bin b = new Bin(new Size(1000, 1000, 1000), new StackConfig(50, 1000, 50, 1000, 50));
+        final Bin b = new Bin(new Size(1000, 1000, 1000), new StackConfig(50, 1000, 50, 1000, 50, false));
         final Cargo<Size> w = new Cargo<Size>(new Size(300, 200, 400), new Size(150, 0, 150));
         final Cargo<Size> x = new Cargo<Size>(new Size(200, 200, 300), new Size(200, 0, 550));
         final Cargo<Size> y = new Cargo<Size>(new Size(200, 200, 200), new Size(450, 0, 150));

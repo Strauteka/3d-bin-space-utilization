@@ -12,7 +12,7 @@ import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class Bin extends Size {
     private final StackConfig stackConfig;
-    private final List<Cargo<? extends Size>> cargo = new ArrayList<Cargo<?>>();
+    private final List<Cargo<? extends Dimension>> cargo = new ArrayList<Cargo<?>>();
     private List<Space> space = new ArrayList<Space>();
 
     public Bin(Bin bin) {
@@ -21,7 +21,7 @@ public class Bin extends Size {
     }
 
     public Bin(Dimension size) {
-        this(size, new StackConfig(0, 0, 0, 0, 0));
+        this(size, new StackConfig(0, 0, 0, 0, 0, false));
     }
 
     public Bin(Dimension size, StackConfig overStack) {
@@ -30,19 +30,19 @@ public class Bin extends Size {
         space.add(new Space(this, new Size(0, 0, 0)));
     }
 
-    public void add(Cargo<? extends Size> cargo) {
+    public void add(Cargo<? extends Dimension> cargo) {
         add(cargo, false);
     }
 
-    public void add(Cargo<? extends Size> cargo, boolean disableTop) {
+    public void add(Cargo<? extends Dimension> cargo, boolean disableTop) {
         this.cargo.add(cargo);
         this.space = dropUnusableSpace(mergeAll(dropOverlapSpace(createSpace(space, cargo, disableTop))));
     }
 
-    private List<Space> createSpace(List<Space> space, Cargo<? extends Size> cargo, boolean disableTop) {
+    private List<Space> createSpace(List<Space> space, Cargo<? extends Dimension> cargo, boolean disableTop) {
         return Stream
                 .concat(space.stream().filter(e -> e.overlap(cargo)).map(e -> e.createSpace(cargo, disableTop))
-                        .flatMap(e -> e.stream()), space.stream().filter(e -> !e.overlap(cargo)))
+                        .flatMap(e -> e.stream()).distinct(), space.stream().filter(e -> !e.overlap(cargo)))
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +61,7 @@ public class Bin extends Size {
         return Collections.unmodifiableList(space);
     }
 
-    public List<Cargo<? extends Size>> cargo() {
+    public List<Cargo<? extends Dimension>> cargo() {
         return Collections.unmodifiableList(cargo);
     }
 
@@ -70,16 +70,18 @@ public class Bin extends Size {
     }
 
     private List<Space> mergeAll(List<Space> space) {
+        if (stackConfig.disableMerge())
+            return space;
         final List<Space> mergedItems = merge(space);
-        if (!mergedItems.isEmpty()) {
+        if (!mergedItems.isEmpty())
             return mergeAll(Stream
                     .concat(mergedItems.stream(),
                             space.stream()
                                     .filter(e -> !mergedItems.stream().filter(x -> x.overlay(e)).findAny().isPresent()))
                     .collect(Collectors.toList()));
-        } else {
-            return space;
-        }
+
+        return space;
+
     }
 
     private List<Space> merge(List<Space> space) {
@@ -91,16 +93,9 @@ public class Bin extends Size {
                 .collect(Collectors.toList());
     }
 
-    public Bin binTurn(Rotation rotation) {
-        if (rotation.equals(Rotation.whl)) {
-            final Bin rotatedBin = new Bin(super.rotate(rotation));
-            this.cargo().stream().forEach(e -> rotatedBin.add(e.cargoTurn(rotation)));
-            return rotatedBin;
-        } else if (rotation.equals(Rotation.lhw))
-            return this;
-        else {
-            throw new RuntimeException(
-                    "Bin can turn only side-way using Rotation.whl. Current rotation: " + rotation.name());
-        }
+    public Bin binRotate(Rotation rotation) {
+        final Bin rotatedBin = new Bin(rotate(rotation), this.stackConfig);
+        this.cargo().stream().forEach(e -> rotatedBin.add(Utils.cargoRotate((Size) rotatedBin, rotation, e)));
+        return rotatedBin;
     }
 }

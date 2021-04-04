@@ -2,7 +2,7 @@ package org.strauteka.jbin.core;
 
 import org.strauteka.jbin.core.Utils.Rotation;
 
-public class Cargo<T extends Size> extends Space {
+public class Cargo<T extends Dimension> extends Space {
 
     private final T cargo;
     private final Dimension stack;
@@ -41,18 +41,5 @@ public class Cargo<T extends Size> extends Space {
 
     public Rotation rotation() {
         return this.rotate;
-    }
-
-    // rotate with position points, used when drawing pallet side
-    protected Cargo<T> cargoTurn(Rotation rotation) {
-        if (rotation.equals(Rotation.whl)) {
-            return new Cargo<T>(this.cargo(), stack.w(), stack.h(), stack.l(), Utils.rotateSwitch(rotate),
-                    position().rotate(Rotation.whl));
-        } else if (rotation.equals(Rotation.lhw))
-            return this;
-        else {
-            throw new RuntimeException(
-                    "Cargo can turn only side-way using Rotation.whl. Current rotation: " + rotation.name());
-        }
     }
 }

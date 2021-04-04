@@ -75,97 +75,99 @@ public class Space extends Size {
 
     public List<Space> createSpace(Space cargo, boolean disableTop) {
         final List<Space> collector = new ArrayList<>();
-        if (overlap(cargo)) {
-            final int top = h__() - cargo.h__();
-            final int bottom = cargo.h_() - h_();
-            final int right = w__() - cargo.w__();
-            final int left = cargo.w_() - w_();
-            final int front = l__() - cargo.l__();
-            final int rear = cargo.l_() - l_();
-            if (left > 0) {
-                collector.add(new Space(l(), h(), left, l_(), h_(), w_()));
-            }
-            if (right > 0) {
-                collector.add(new Space(l(), h(), right, l_(), h_(), cargo.w__()));
-            }
-            if (front > 0) {
-                collector.add(new Space(front, h(), w(), cargo.l__(), h_(), w_()));
-            }
-            if (rear > 0) {
-                collector.add(new Space(rear, h(), w(), l_(), h_(), w_()));
-            }
-            if (top > 0 && !disableTop) { // upper
-                final Size overlap = overlapSize(cargo);
-                final int pointW = Math.max(w_(), cargo.w_());
-                final int pointL = Math.max(l_(), cargo.l_());
-                collector.add(new Space(overlap.l(), top, overlap.w(), pointL, cargo.h__(), pointW));
-            }
-            if (bottom > 0) {// under
-                collector.add(new Space(l(), bottom, w(), l_(), h_(), w_()));
-            }
+
+        final int top = h__() - cargo.h__();
+        final int bottom = cargo.h_() - h_();
+        final int right = w__() - cargo.w__();
+        final int left = cargo.w_() - w_();
+        final int front = l__() - cargo.l__();
+        final int rear = cargo.l_() - l_();
+
+        if (left > 0)
+            collector.add(new Space(l(), h(), left, l_(), h_(), w_()));
+
+        if (right > 0)
+            collector.add(new Space(l(), h(), right, l_(), h_(), cargo.w__()));
+
+        if (front > 0)
+            collector.add(new Space(front, h(), w(), cargo.l__(), h_(), w_()));
+
+        if (rear > 0)
+            collector.add(new Space(rear, h(), w(), l_(), h_(), w_()));
+
+        if (top > 0 && !disableTop) { // upper
+            final Size overlap = overlapSize(cargo);
+            collector.add(new Space(overlap.l(), top, overlap.w(), Math.max(l_(), cargo.l_()), cargo.h__(),
+                    Math.max(w_(), cargo.w_())));
         }
+        if (bottom > 0) // under
+            collector.add(new Space(l(), bottom, w(), l_(), h_(), w_()));
+
         return collector;
     }
 
     public boolean needToCombineSpace(Space s, StackConfig conf) {
         final Size os = overlapSize(s);
-        return this.w__() == s.w_() && os.l() > 0 && os.h() > 0 //
+        return this.w__() == s.w_() && os.l() > 0 && os.h() > 0 // combine near in side
                 && ((h_() < s.h_() ? w() : s.w()) <= conf.w_() || h_() == s.h_()) //
-                || this.l__() == s.l_() && os.w() > 0 && os.h() > 0
+                || this.l__() == s.l_() && os.w() > 0 && os.h() > 0// combine near in front
                         && ((h_() < s.h_() ? l() : s.l()) <= conf.l_() || h_() == s.h_()) //
-                || os.w() > 0 && os.w() <= conf.w() && os.l() > 0 && os.h() > 0 && h_() == s.h_()//
-                || os.l() > 0 && os.l() <= conf.l() && os.w() > 0 && os.h() > 0 && h_() == s.h_();
+                || os.w() > 0 && os.w() <= conf.w() && os.l() > 0 && os.h() > 0 && h_() == s.h_()// near extended side
+                || os.l() > 0 && os.l() <= conf.l() && os.w() > 0 && os.h() > 0 && h_() == s.h_();// near extended front
     }
 
     public Space combineSpace(Space space, StackConfig conf) {
         final Size os = overlapSize(space);
         final int h_ = Math.max(h_(), space.h_());
         final int h__ = Math.min(h__(), space.h__());
-        if (os.w() == 0 && os.l() > 0) {
+
+        if (os.w() == 0 && os.l() > 0)
             return new Space(os.l(), (h__ - h_), expand(h_() - space.h_(), w(), space.w(), conf.w()),
                     Math.max(l_(), space.l_()), h_, findPosition(h_() - space.h_(), w_(), space.w_(), conf.w()));
-        } else if (os.l() == 0 && os.w() > 0) {
+
+        if (os.l() == 0 && os.w() > 0)
             return new Space(expand(h_() - space.h_(), l(), space.l(), conf.l()), (h__ - h_), os.w(),
                     findPosition(h_() - space.h_(), l_(), space.l_(), conf.l()), h_, Math.max(w_(), space.w_()));
-        } else if (os.w() > 0 && os.w() <= conf.w() && os.l() > 0) { // Merging expanded space.
+
+        if (os.w() > 0 && os.w() <= conf.w() && os.l() > 0) // Merging expanded space.
             return new Space(os.l(), (h__ - h_), w() + space.w() - os.w(), Math.max(l_(), space.l_()), h_,
                     Math.min(w_(), space.w_()));
-        } else if (os.l() > 0 && os.l() <= conf.l() && os.w() > 0) { // Merging expanded space.
+
+        if (os.l() > 0 && os.l() <= conf.l() && os.w() > 0) // Merging expanded space.
             return new Space(l() + space.l() - os.l(), (h__ - h_), os.w(), Math.min(l_(), space.l_()), h_,
                     Math.max(w_(), space.w_()));
-        } else {
-            System.err.println("System Error! Space.combineSpace(Space space, StackConfig conf)");
-            return null;
-        }
+
+        System.err.println("System Error! Space.combineSpace(Space space, StackConfig conf)");
+        return null; // no nulls :( it is handled Jesus driven developer at work...
+
     }
 
     private static int findPosition(int h, int pos1, int pos2, int maxExpand) {
-        if (h >= 0) {
+        if (h >= 0)
             return Math.min(pos1, pos2);
-        } else {
-            return Math.max(pos1, pos2) - Math.min(Math.abs(pos1 - pos2), maxExpand);
-        }
+
+        return Math.max(pos1, pos2) - Math.min(Math.abs(pos1 - pos2), maxExpand);
     }
 
     private static int expand(int h, int x1, int x2, int maxExpand) {
-        if (h == 0) {
+        if (h == 0)
             return x1 + x2;
-        } else if (h < 0) {
+
+        if (h < 0)
             return Math.min(x1, maxExpand) + x2;
-        } else {
-            return Math.min(x2, maxExpand) + x1;
-        }
+
+        return Math.min(x2, maxExpand) + x1;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
+        if (o == this)
             return true;
-        } else if (!(o instanceof Space)) {
+
+        if (!(o instanceof Space))
             return false;
-        } else {
-            return super.equals(o) && position.equals(((Space) o).position());
-        }
+
+        return super.equals(o) && position.equals(((Space) o).position());
     }
 
     @Override
