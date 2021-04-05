@@ -14,7 +14,7 @@ import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class Bin extends Size {
     private final StackConfig stackConfig;
-    private final List<Cargo<? extends Dimension>> cargo;;
+    private final List<Cargo<? extends Dimension>> cargo;
     private List<Space> space;
 
     public Bin(Bin bin) {
