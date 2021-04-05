@@ -60,7 +60,11 @@ Notes:
 
 ### 50 types of items.
 
-![draw-demo1.jpg](./resources/draw-demo5.png)
+![draw-demo5.jpg](./resources/draw-demo5.png)
+
+### 100 types of items.
+
+![draw-demo6.jpg](./resources/draw-demo6.png)
 
 ## Problems with `java3d` libraries?
 
