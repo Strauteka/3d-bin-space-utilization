@@ -76,7 +76,8 @@ public class PackerUnit {
         final List<Cargo<? extends Size>> cargo = itemUtilize.stream().map(e -> createCargo(space, e._1, e._2))
                 .flatMap(e -> e.stream()).collect(Collectors.toList());
         if (random(0, 2) == 0)
-            return Optional.of(cargo.get(random(0, cargo.size() - 1)));
+            return cargo.stream().sorted(Comparator.comparingInt(e -> (space.h() * space.w()) - (e.h() * e.w())))
+                    .findFirst();
 
         return cargo.stream().sorted(Comparator.comparingInt(e -> (space.l() * space.w()) - (e.l() * e.w())))
                 .findFirst();

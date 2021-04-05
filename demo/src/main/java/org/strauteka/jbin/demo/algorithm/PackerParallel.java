@@ -44,7 +44,7 @@ public class PackerParallel {
             final long max = o2._1.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum)
                     - o1._1.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum);
             if (max != 0)
-                return max > 0 ? 1 : (max < 0 ? -1 : 0);
+                return max > 0 ? 1 : -1;
 
             final int h = o1._1.cargo().stream().mapToInt(x -> x.h__()).max().orElse(0)
                     - o2._1.cargo().stream().mapToInt(x -> x.h__()).max().orElse(0);

@@ -1,9 +1,11 @@
 package org.strauteka.jbin.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,22 +14,33 @@ import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class Bin extends Size {
     private final StackConfig stackConfig;
-    private final List<Cargo<? extends Dimension>> cargo = new ArrayList<Cargo<?>>();
-    private List<Space> space = new ArrayList<Space>();
+    private final List<Cargo<? extends Dimension>> cargo;;
+    private List<Space> space;
 
     public Bin(Bin bin) {
-        this(bin, bin.stackConfig());
-        bin.cargo.stream().sequential().forEach(e -> this.add(e));
+        this(bin, bin.stackConfig(), bin.emptySpace(), bin.cargo());
+    }
+
+    public Bin(Bin bin, StackConfig overStack) {
+        this(bin, Optional.ofNullable(overStack).orElseGet(() -> bin.stackConfig()), bin.emptySpace(), bin.cargo());
     }
 
     public Bin(Dimension size) {
-        this(size, new StackConfig(0, 0, 0, 0, 0, false));
+        this(size, new StackConfig(0, 0, 0, 0, 0, false), null, null);
     }
 
     public Bin(Dimension size, StackConfig overStack) {
+        this(size, overStack, null, null);
+    }
+
+    public Bin(Dimension size, StackConfig overStack, List<Space> space, List<Cargo<? extends Dimension>> cargo) {
         super(size);
         this.stackConfig = overStack;
-        space.add(new Space(this, new Size(0, 0, 0)));
+        this.cargo = Optional.ofNullable(cargo).orElseGet(() -> new ArrayList<Cargo<? extends Dimension>>()).stream()
+                .collect(Collectors.toList());
+        this.space = Optional.ofNullable(space)
+                .orElseGet(() -> new ArrayList<Space>(Arrays.asList(new Space(this, new Size(0, 0, 0))))).stream()
+                .collect(Collectors.toList());
     }
 
     public void add(Cargo<? extends Dimension> cargo) {
@@ -81,7 +94,6 @@ public class Bin extends Size {
                     .collect(Collectors.toList()));
 
         return space;
-
     }
 
     private List<Space> merge(List<Space> space) {

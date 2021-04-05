@@ -19,7 +19,7 @@ public class App {
 
         Map<Dimension, Color> colors = new HashMap<>();
         colors.put(new Size(400, 500, 1000), new Color(255, 0, 0));
-        Draw3d.draw(false, false, 1200, 800, colors, PackerEntry.calculate(3000, 3).toArray(new Bin[0]));
+        Draw3d.draw(true, false, 1200, 800, colors, PackerEntry.calculate(3000, 3).toArray(new Bin[0]));
         System.out.println("Calc time: " + (System.currentTimeMillis() - l));
     }
 }
