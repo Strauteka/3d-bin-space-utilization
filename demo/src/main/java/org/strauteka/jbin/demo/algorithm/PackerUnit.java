@@ -3,141 +3,115 @@ package org.strauteka.jbin.demo.algorithm;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
+import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.Space;
 import org.strauteka.jbin.core.Utils.Rotation;
 
 public class PackerUnit {
 
-    public static Tuple2<Bin, List<Tuple2<Item, Integer>>> pack(Bin bin, List<Tuple2<Item, Integer>> items,
-            AtomicBoolean atomicStop, int id) {
-        // System.out.println(
-        // "Current Thread Name- " + Thread.currentThread().getName() + " :: " +
-        // Thread.currentThread().getId());
-        if (atomicStop.get())
-            return new Tuple2<Bin, List<Tuple2<Item, Integer>>>(bin, items);
+    public static Tuple2<Bin, List<Tuple2<Item, Integer>>> pack(Bin bin, List<Tuple2<Item, Integer>> items, long stop,
+            int id) {
+        if (System.currentTimeMillis() >= stop)
+            return Tuple2.of(bin, items);
 
-        return packRecursive(new Bin(bin), items);
+        return packRecursive(bin, items, id);
     }
 
     private static Tuple2<Bin, List<Tuple2<Item, Integer>>> packRecursive(Bin bin,
-            List<Tuple2<Item, Integer>> itemUtilize) {
-        final Optional<Cargo<? extends Size>> optCargo = findCargo(bin.emptySpace(),
-                itemUtilize.stream().filter(e -> e._1.qty() > e._2).collect(Collectors.toList()));
+            List<Tuple2<Item, Integer>> itemUtilize, int id) {
+        final Optional<Cargo<? extends Dimension>> optCargo = findCargo(bin.emptySpace(),
+                itemUtilize.stream().filter(e -> e._1.qty() > e._2).collect(Collectors.toList()), id);
 
         if (!optCargo.isPresent())
-            return new Tuple2<Bin, List<Tuple2<Item, Integer>>>(bin, itemUtilize);
+            return Tuple2.of(bin, itemUtilize);
 
-        final Cargo<? extends Size> cargo = optCargo.get();
-        bin.add(cargo);
+        final Cargo<? extends Dimension> cargo = optCargo.get();
+        final Bin nextBin = bin.add(cargo);
         final Item cargoItem = (Item) cargo.cargo();
         final List<Tuple2<Item, Integer>> next = Stream
                 .concat(itemUtilize.stream().filter(e -> !e._1.equals(cargoItem)), //
                         itemUtilize.stream().filter(e -> e._1.equals(cargoItem))
-                                .map(e -> new Tuple2<>(e._1, e._2 + (int) cargo.stack().value())))
+                                .map(e -> Tuple2.of(e._1, e._2 + Long.valueOf(cargo.stack().value()).intValue())))
                 .collect(Collectors.toList());
-        return packRecursive(bin, next);
+        return packRecursive(nextBin, next, id);
     }
 
-    private static Optional<Cargo<? extends Size>> findCargo(List<Space> spaces,
-            List<Tuple2<Item, Integer>> itemUtilize) {
+    private static Optional<Cargo<? extends Dimension>> findCargo(List<Space> spaces,
+            List<Tuple2<Item, Integer>> itemUtilize, int id) {
         // looping through all spaces is time consuming...
-        final Optional<Space> space = selectSpace(spaces, itemUtilize);
+        final Optional<Space> space = selectSpace(spaces, itemUtilize, id);
         if (space.isPresent())
             return createCargo(space.get(), itemUtilize);
 
         return Optional.empty();
     }
 
-    private static Optional<Space> selectSpace(List<Space> spaces, List<Tuple2<Item, Integer>> itemUtilize) {
+    private static Optional<Space> selectSpace(List<Space> spaces, List<Tuple2<Item, Integer>> itemUtilize, int id) {
         // filter off spaces that can't fit any item
         return selectSpace(
                 spaces.stream().filter(e -> itemUtilize.stream().filter(x -> e.fitAny(x._1)).findAny().isPresent())
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()),
+                id);
     }
 
-    private static Optional<Space> selectSpace(List<Space> validSpaces) {
+    private static Optional<Space> selectSpace(List<Space> validSpaces, int id) {
         if (validSpaces.isEmpty())
             return Optional.empty();
-        if (random(0, 2) == 0)
-            return Optional.of(validSpaces.get(random(0, validSpaces.size() - 1)));
-
-        return validSpaces.stream().sorted(Comparator.comparingInt(e -> e.h_())).findFirst();
+        return id % 2 == 0
+                ? validSpaces.stream().sorted(Comparator.comparingLong(e -> Utils.concat(e.h_(), e.w_(), e.l_())))
+                        .findFirst()
+                : validSpaces.stream().sorted(Comparator.comparingLong(e -> -Utils.concat(e.h_(), e.w_(), e.l_())))
+                        .findFirst();
     }
 
-    private static Optional<Cargo<? extends Size>> createCargo(Space space, List<Tuple2<Item, Integer>> itemUtilize) {
-        final List<Cargo<? extends Size>> cargo = itemUtilize.stream().map(e -> createCargo(space, e._1, e._2))
-                .flatMap(e -> e.stream()).collect(Collectors.toList());
-        if (random(0, 2) == 0)
-            return cargo.stream().sorted(Comparator.comparingInt(e -> (space.h() * space.w()) - (e.h() * e.w())))
-                    .findFirst();
-
-        return cargo.stream().sorted(Comparator.comparingInt(e -> (space.l() * space.w()) - (e.l() * e.w())))
-                .findFirst();
+    private static Optional<Cargo<? extends Dimension>> createCargo(Space space,
+            List<Tuple2<Item, Integer>> itemUtilize) {
+        return itemUtilize.stream().map(e -> createCargo(space, e._1, e._2)).flatMap(e -> e.stream())
+                .sorted(Comparator.comparingLong(e -> {
+                    final Size s = space.subtract(e);
+                    return Utils.concat(s.h(), s.w(), s.l(), 50);
+                })).findFirst();
     }
 
-    private static List<Cargo<? extends Size>> createCargo(Space space, Item item, Integer qty) {
+    private static List<Cargo<? extends Dimension>> createCargo(Space space, Item item, Integer qty) {
         return Stream.of(Rotation.values()).filter(e -> space.fit(item.rotate(e)))
-                .map(e -> buildCargoSwitch(space, item, qty, e)).collect(Collectors.toList());
+                .map(e -> buildCargoSwitch(space, item, qty, e)).flatMap(e -> e.stream()).collect(Collectors.toList());
     }
 
-    private static Cargo<? extends Size> buildCargoSwitch(Space space, Item item, Integer qtyUsed, Rotation rotation) {
-        int rndSwitch = random(0, 4);
-        if (rndSwitch == 0)
-            return buildCargoA(space, item, (item.qty() - qtyUsed), rotation);
-        if (rndSwitch == 1)
-            return buildCargoB(space, item, (item.qty() - qtyUsed), rotation);
-
-        return buildCargoC(space, item, (item.qty() - qtyUsed), rotation);
+    private static List<Cargo<? extends Dimension>> buildCargoSwitch(Space space, Item item, Integer qtyUsed,
+            Rotation rotation) {
+        return Stream.of(buildCargoA(space, item, (item.qty() - qtyUsed), rotation),
+                buildCargoB(space, item, (item.qty() - qtyUsed), rotation),
+                buildCargoC(space, item, (item.qty() - qtyUsed), rotation)).collect(Collectors.toList());
     }
 
-    private static Cargo<? extends Size> buildCargoC(Space space, Item item, Integer qtyLeft, Rotation rotation) {
-        final Size maxQtyOnDimension = maxQtyOnDimension(space, item.rotate(rotation));
-        final int l = randomReduce(Math.min(maxQtyOnDimension.l(), qtyLeft));
-        final int h = randomReduce(Math.min(grow(qtyLeft, l), maxQtyOnDimension.h()));
-        final int w = Math.min(grow(qtyLeft, l * h), maxQtyOnDimension.w());
+    private static Cargo<? extends Dimension> buildCargoC(Space space, Item item, Integer qtyLeft, Rotation rotation) {
+        final Size maxQtyOnDimension = Utils.maxQtyOnDimension(space, item.rotate(rotation));
+        final int l = Utils.randomReduce(Math.min(maxQtyOnDimension.l(), qtyLeft));
+        final int h = Utils.randomReduce(Math.min(Utils.grow(qtyLeft, l), maxQtyOnDimension.h()));
+        final int w = Math.min(Utils.grow(qtyLeft, l * h), maxQtyOnDimension.w());
         return new Cargo<Size>(item, l, h, w, rotation, space.position());
     }
 
-    private static Cargo<? extends Size> buildCargoB(Space space, Item item, Integer qtyLeft, Rotation rotation) {
-        final Size maxQtyOnDimension = maxQtyOnDimension(space, item.rotate(rotation));
-        final int w = randomReduce(Math.min(maxQtyOnDimension.w(), qtyLeft));
-        final int l = randomReduce(Math.min(grow(qtyLeft, w), maxQtyOnDimension.l()));
+    private static Cargo<? extends Dimension> buildCargoB(Space space, Item item, Integer qtyLeft, Rotation rotation) {
+        final Size maxQtyOnDimension = Utils.maxQtyOnDimension(space, item.rotate(rotation));
+        final int w = Utils.randomReduce(Math.min(maxQtyOnDimension.w(), qtyLeft));
+        final int l = Utils.randomReduce(Math.min(Utils.grow(qtyLeft, w), maxQtyOnDimension.l()));
         final int h = 1;
         return new Cargo<Size>(item, l, h, w, rotation, space.position());
     }
 
-    private static Cargo<? extends Size> buildCargoA(Space space, Item item, Integer qtyLeft, Rotation rotation) {
-        final Size maxQtyOnDimension = maxQtyOnDimension(space, item.rotate(rotation));
-        final int l = randomReduce(Math.min(maxQtyOnDimension.l(), qtyLeft));
-        final int w = randomReduce(Math.min(grow(qtyLeft, l), maxQtyOnDimension.w()));
+    private static Cargo<? extends Dimension> buildCargoA(Space space, Item item, Integer qtyLeft, Rotation rotation) {
+        final Size maxQtyOnDimension = Utils.maxQtyOnDimension(space, item.rotate(rotation));
+        final int l = Utils.randomReduce(Math.min(maxQtyOnDimension.l(), qtyLeft));
+        final int w = Utils.randomReduce(Math.min(Utils.grow(qtyLeft, l), maxQtyOnDimension.w()));
         final int h = 1;
         return new Cargo<Size>(item, l, h, w, rotation, space.position());
-    }
-
-    private static Size maxQtyOnDimension(Space space, Size size) {
-        return new Size(space.l() / size.l(), space.h() / size.h(), space.w() / size.w());
-    }
-
-    private static int grow(int max, int step) {
-        return max / step;
-    }
-
-    private static int random(int origin, int boundInclusive) {
-        return ThreadLocalRandom.current().nextInt(origin, (boundInclusive + 1));
-    }
-
-    private static int randomReduce(int input) {
-        if (input > 1 && random(0, 2) == 0)
-            return (input - 1);
-
-        return input;
     }
 }

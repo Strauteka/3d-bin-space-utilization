@@ -1,32 +1,48 @@
 package org.strauteka.jbin.demo.algorithm;
 
+import java.util.List;
+
 import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
+import org.strauteka.jbin.core.Space;
+import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class Pallet extends Bin {
-    private Bin palletBin;
-    private Size pallet;
+    private final Bin bin;
 
-    public Pallet(Dimension size, int h) {
-        super(size);
-        this.palletBin = new Bin(new Size(size.l(), size.h() - h, size.w()));
-        this.pallet = new Size(this.l(), h, this.w());
-        super.add(new Cargo<Size>(this.pallet, new Size(0, 0, 0)));
-        super.add(new Cargo<Bin>(this.palletBin, new Size(0, h, 0)));
+    public Pallet(Bin bin) {
+        super(bin);
+        this.bin = bin;
     }
 
-    public Bin palletBin() {
-        return palletBin;
-    }
-
-    public Size pallet() {
-        return pallet;
+    public static Pallet pallet(Dimension size, int h) {
+        return new Pallet(new Bin(size).add(new Cargo<Size>(new Size(size.l(), h, size.w()), new Size(0, 0, 0))));
     }
 
     @Override
-    public void add(Cargo<?> cargo) {
-        throw new RuntimeException("Use function Pallet.palletBin().add(Cargo<?> cargo) when adding boxes to pallet!");
+    public Pallet add(Cargo<?> cargo) {
+        return new Pallet(bin.add(cargo));
+    }
+
+    @Override
+    public Pallet add(Cargo<? extends Dimension> cargo, boolean disableTop) {
+        return new Pallet(bin.add(cargo, disableTop));
+    }
+
+    @Override
+    public List<Space> emptySpace() {
+        return bin.emptySpace();
+    }
+
+    @Override
+    public List<Cargo<? extends Dimension>> cargo() {
+        return bin.cargo();
+    }
+
+    @Override
+    public StackConfig stackConfig() {
+        return bin.stackConfig();
     }
 }

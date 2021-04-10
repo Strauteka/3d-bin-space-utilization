@@ -15,18 +15,26 @@ import org.strauteka.jbin.core.configuration.StackConfig;
 public class Bin extends Size {
     private final StackConfig stackConfig;
     private final List<Cargo<? extends Dimension>> cargo;
-    private List<Space> space;
+    private final List<Space> space;
 
     public Bin(Bin bin) {
-        this(bin, bin.stackConfig(), bin.emptySpace(), bin.cargo());
+        this(bin, bin.stackConfig());
     }
 
     public Bin(Bin bin, StackConfig overStack) {
         this(bin, Optional.ofNullable(overStack).orElseGet(() -> bin.stackConfig()), bin.emptySpace(), bin.cargo());
     }
 
+    public Bin(int l, int h, int w) {
+        this(new Size(l, h, w));
+    }
+
+    public Bin(int l, int h, int w, StackConfig overStack) {
+        this(new Size(l, h, w), overStack);
+    }
+
     public Bin(Dimension size) {
-        this(size, new StackConfig(0, 0, 0, 0, 0, false), null, null);
+        this(size, new StackConfig(0, 0, 0, 0, 0, false));
     }
 
     public Bin(Dimension size, StackConfig overStack) {
@@ -36,20 +44,21 @@ public class Bin extends Size {
     public Bin(Dimension size, StackConfig overStack, List<Space> space, List<Cargo<? extends Dimension>> cargo) {
         super(size);
         this.stackConfig = overStack;
-        this.cargo = Optional.ofNullable(cargo).orElseGet(() -> new ArrayList<Cargo<? extends Dimension>>()).stream()
-                .collect(Collectors.toList());
-        this.space = Optional.ofNullable(space)
+        this.cargo = Collections.unmodifiableList(Optional.ofNullable(cargo)
+                .orElseGet(() -> new ArrayList<Cargo<? extends Dimension>>()).stream().collect(Collectors.toList()));
+        this.space = Collections.unmodifiableList(Optional.ofNullable(space)
                 .orElseGet(() -> new ArrayList<Space>(Arrays.asList(new Space(this, new Size(0, 0, 0))))).stream()
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())); // collect toUnmodifiableList error java 1.8 todo: fix?
     }
 
-    public void add(Cargo<? extends Dimension> cargo) {
-        add(cargo, false);
+    public Bin add(Cargo<? extends Dimension> cargo) {
+        return add(cargo, false);
     }
 
-    public void add(Cargo<? extends Dimension> cargo, boolean disableTop) {
-        this.cargo.add(cargo);
-        this.space = dropUnusableSpace(mergeAll(dropOverlapSpace(createSpace(space, cargo, disableTop))));
+    public Bin add(Cargo<? extends Dimension> cargo, boolean disableTop) {
+        return new Bin(this, this.stackConfig,
+                dropUnusableSpace(mergeAll(dropOverlapSpace(createSpace(space, cargo, disableTop)))),
+                Stream.concat(this.cargo.stream(), Stream.of(cargo)).collect(Collectors.toList()));
     }
 
     private List<Space> createSpace(List<Space> space, Cargo<? extends Dimension> cargo, boolean disableTop) {
@@ -71,11 +80,11 @@ public class Bin extends Size {
     }
 
     public List<Space> emptySpace() {
-        return Collections.unmodifiableList(space);
+        return space;
     }
 
     public List<Cargo<? extends Dimension>> cargo() {
-        return Collections.unmodifiableList(cargo);
+        return cargo;
     }
 
     public StackConfig stackConfig() {
@@ -106,8 +115,9 @@ public class Bin extends Size {
     }
 
     public Bin binRotate(Rotation rotation) {
-        final Bin rotatedBin = new Bin(rotate(rotation), this.stackConfig);
-        this.cargo().stream().forEach(e -> rotatedBin.add(Utils.cargoRotate((Size) rotatedBin, rotation, e)));
-        return rotatedBin;
+        return this.cargo().stream().reduce(new Bin(rotate(rotation), this.stackConfig),
+                (bin, cargo) -> bin.add(Utils.cargoRotate((Size) bin, rotation, cargo)), (bin1, bin2) -> {
+                    throw new UnsupportedOperationException();
+                });
     }
 }

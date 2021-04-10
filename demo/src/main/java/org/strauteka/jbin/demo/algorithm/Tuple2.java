@@ -9,6 +9,10 @@ public class Tuple2<K, V> {
         this._2 = _2;
     }
 
+    public static <KK, VV> Tuple2<KK, VV> of(KK key, VV value) {
+        return new Tuple2<KK, VV>(key, value);
+    }
+
     @Override
     public String toString() {
         return _1.toString() + " : " + _2.toString();
@@ -16,16 +20,14 @@ public class Tuple2<K, V> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == null)
             return false;
-        } else if (this == obj) {
+        if (this == obj)
             return true;
-        } else if (obj instanceof Tuple2<?, ?> && ((Tuple2<?, ?>) obj)._1.equals(_1)
-                && ((Tuple2<?, ?>) obj)._2.equals(_2)) {
+        if (obj instanceof Tuple2<?, ?> && ((Tuple2<?, ?>) obj)._1.equals(_1) && ((Tuple2<?, ?>) obj)._2.equals(_2))
             return true;
-        } else {
-            return false;
-        }
+
+        return false;
     }
 
     @Override

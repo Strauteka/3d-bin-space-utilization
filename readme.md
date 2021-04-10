@@ -2,31 +2,26 @@
 
 ## Square space utilization core for 3d bin packing algorithm.
 
-When starting to write algorithm for <strong>`3d Container loading software`</strong> it is hard to understand how to utilize space while adding cargo to it. I present you my algorithm of space utilization for 3d container packing software.  
-<span style="color:red"><strong>Important! </strong></span>
-<strong>Library does not provide useful packing algorithm:</strong>
+When starting to write algorithm for <strong>`3d Container loading software`</strong> it is hard to understand how to utilize space while adding cargo to it. I give you my algorithm / structure of space utilization for 3d container packing software.
 
-- Demo packing algorithm is only to overview code usage, it helps to start writing your own container packing algorithm.
-- Although it gives you solid results, each time it will give you different solution for the same problem.
+- Demo packing algorithm gives you a very good results and understanding about code usage.
+- Algorithm based on Random and little bit of magic :) Unfortunately, each time it will give you different solution for the same problem.
 - java3d library and Draw3d class gives you quick look / development tool for your algorithm results.
 
 Notes:
 
 - Coordinates for `Bin` starts at (`0,0,0`):[`length, height, width`] and goes till defined bin size.
 
-- Each time, when you add `Cargo` to `Bin` you have to collect new `Bin.emptySpace()` list to know latest
-  information of empty spaces in `Bin`.
+- Each time, when adding `Cargo` to `Bin` core will create `new unmodifiable Bin` with added cargo to it.
 
-- Core does not provide any restrictions when adding cargo, it provides information of empty spaces.
-
-- Cargo can overlap if wrongly added.
+- Core does not provide any restrictions when adding cargo, cargo can overlap, if not respected empty space.
 
 - In `Bin`, `Cargo` rotates at most on six positions / sides.
   ![draw-demo1.jpg](./resources/draw-demo2.png)
 
 - Detailed info
   - Run demo code.
-  - View demo algorithm: https://github.com/Strauteka/3d-bin-space-utilization/blob/main/demo/src/main/java/org/strauteka/jbin/demo/algorithm PackerEntry.java class
+  - Explore demo algorithm: https://github.com/Strauteka/3d-bin-space-utilization/blob/main/demo/src/main/java/org/strauteka/jbin/demo/algorithm PackerEntry.java class
 
 # Usage
 
@@ -34,9 +29,9 @@ Notes:
 - Compile: `mvn clean install`
 - Run Demo: `java -jar .\demo\target\demo-jar-with-dependencies.jar`
 
-## Todo:
+# Requires
 
-- released first version
+- Java 1.8
 
 ## Preview core
 

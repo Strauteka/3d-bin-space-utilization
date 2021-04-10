@@ -2,11 +2,6 @@ package org.strauteka.jbin.demo.algorithm;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -16,25 +11,16 @@ public class PackerParallel {
 
     public static Tuple2<Bin, List<Tuple2<Item, Integer>>> calculate(int iterations, int calcSec, Bin bin,
             List<Tuple2<Item, Integer>> items) {
-        // scheduled stop
-        final AtomicBoolean atomicStop = new AtomicBoolean(Boolean.FALSE);
-        final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Stopping rat-race!");
-                atomicStop.set(Boolean.TRUE);
-            }
-        };
+        // stop timer
+        final long stop = System.currentTimeMillis() + (calcSec * 1000);
 
-        final ScheduledFuture<?> scheduledFuture = scheduledExecutorService.schedule(r, calcSec, TimeUnit.SECONDS);
         final List<Tuple2<Bin, List<Tuple2<Item, Integer>>>> result = IntStream.range(0, iterations).parallel()
-                .mapToObj(e -> PackerUnit.pack(bin, items, atomicStop, e)).sorted(sortMaxFirstLowestSecond)
+                .mapToObj(e -> PackerUnit.pack(bin, items, stop, e)).sorted(sortMaxFirstLowestSecond)
                 .collect(Collectors.toList());
         // dbg
         System.out.println(
                 "Bin calculations: " + result.stream().map(e -> !e._1.cargo().isEmpty()).filter(e -> e).count());
-        scheduledFuture.cancel(true);
+
         return result.get(0);
     }
 

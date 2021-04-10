@@ -27,11 +27,10 @@ public class PackerEntry {
         final boolean isFullSpace = false;
         final boolean isRndItems = true;
         final long customSize = (long) ((isFullSpace ? bins.stream().map(e -> e.value()).reduce(0l, Long::sum)
-                : bins.get(0).value()) * 1.1);
+                : bins.get(0).value()));
         final List<Item> items = isRndItems ? getRandomItems(20, 200, 700, customSize) : getStaticItems();
-        // final List<Item> items = getStaticItems();
-        List<Tuple2<Item, Integer>> itemsUtil = items.stream().map(e -> new Tuple2<Item, Integer>(e, 0))
-                .collect(Collectors.toList());
+
+        List<Tuple2<Item, Integer>> itemsUtil = items.stream().map(e -> Tuple2.of(e, 0)).collect(Collectors.toList());
         List<Bin> binCollector = new ArrayList<>();
         for (Bin bin : bins) {
             final long ItemSpace = itemsUtil.stream().map(e -> e._1.value() * (e._1.qty() - e._2)).reduce(0l,
@@ -49,9 +48,9 @@ public class PackerEntry {
             long cargoSpace = bin.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum);
             System.out.println("Items added to bins: " + bin + " || "
                     + (Double.valueOf(cargoSpace) / Double.valueOf(bin.value())) + "%");
-            bin.cargo().stream().map(e -> new Tuple2<>((Item) e.cargo(), e.stack().value()))
+            bin.cargo().stream().map(e -> Tuple2.of((Item) e.cargo(), e.stack().value()))
                     .collect(Collectors.groupingBy(e -> e._1, collector))//
-                    .entrySet().stream().map(e -> new Tuple2<Item, Long>(e.getKey(), e.getValue().get(e.getKey())))
+                    .entrySet().stream().map(e -> Tuple2.of(e.getKey(), e.getValue().get(e.getKey())))
                     .forEach(e -> System.out
                             .println(e._1 + " -- " + e._1.qty() + " || " + e._2 + " :: " + (e._1.qty() - e._2)));
         }
@@ -99,7 +98,7 @@ public class PackerEntry {
     }
 
     private static Item itemSize(int itemQty, Size size, long maxSpace, Random rnd) {
-        int qty = (int) ((maxSpace / itemQty) / (size.value()));
+        int qty = Math.round((maxSpace * 1.0f / itemQty) / (size.value()));
         return new Item(size, (qty < 1 ? 1 : qty));
     }
 
