@@ -7,6 +7,7 @@ import com.sun.j3d.utils.behaviors.mouse.MouseWheelZoom;
 
 import com.sun.j3d.utils.universe.SimpleUniverse;
 
+import org.strauteka.jbin.core.AbstractBin;
 import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
@@ -66,8 +67,8 @@ public class Draw3d<T extends Space> extends JPanel {
      * Fill your 3D world with content
      */
 
-    public Draw3d(List<Bin> containers, javax.vecmath.Point3f myPointer, boolean skipEmptySpace, boolean skipBin,
-            Map<Dimension, Color> colors) {
+    public Draw3d(List<AbstractBin<?>> containers, javax.vecmath.Point3f myPointer, boolean skipEmptySpace,
+            boolean skipBin, Map<Dimension, Color> colors) {
 
         this.colors = Optional.ofNullable(colors).orElseGet(() -> new HashMap<Dimension, Color>()).entrySet().stream()
                 .collect(Collectors.toMap(e -> e.getKey(), e -> new Color3f(e.getValue().getRed() / 255f,
@@ -110,7 +111,7 @@ public class Draw3d<T extends Space> extends JPanel {
         objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
         objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 
-        for (Bin container : containers) {
+        for (AbstractBin<?> container : containers) {
             drawContent(objRotate, container, startPointer, skipEmptySpace, skipBin); // getShape
             startPointer.x = (startPointer.x + translate(container.w()) + 0.2f);
         }
@@ -147,9 +148,9 @@ public class Draw3d<T extends Space> extends JPanel {
 
     private void drawBox(TransformGroup objRotate, Cargo<? extends Dimension> content, Point3f posPointer,
             boolean skipEmptySpace, boolean skipBin) {
-        if (content.cargo() instanceof Bin) {
-            drawContent(objRotate, ((Bin) content.cargo()).binRotate(content.rotation()), posPointer, skipEmptySpace,
-                    skipBin);
+        if (content.cargo() instanceof AbstractBin<?>) {
+            drawContent(objRotate, ((AbstractBin<?>) content.cargo()).binRotate(content.rotation()), posPointer,
+                    skipEmptySpace, skipBin);
         } else {
             final Dimension size = content.cargo().rotate(content.rotation());
             final Dimension stack = content.stack();
@@ -170,7 +171,7 @@ public class Draw3d<T extends Space> extends JPanel {
         objRotate.addChild(draw3DRectangle(posPointer, size, col, false));
     }
 
-    private void drawContent(TransformGroup objRotate, Bin bin, Point3f startPointer, boolean skipEmptySpace,
+    private void drawContent(TransformGroup objRotate, AbstractBin<?> bin, Point3f startPointer, boolean skipEmptySpace,
             boolean skipBin) {
         if (!skipBin) {
             objRotate.addChild(draw3DRectangleLine(startPointer, bin, new Color3f(0.0f, 0.0f, 0.0f)));
@@ -458,8 +459,8 @@ public class Draw3d<T extends Space> extends JPanel {
     }
 
     public static void draw(boolean skipEmptySpace, boolean skipBin, int frameW, int frameL,
-            Map<Dimension, Color> colors, Bin... b) {
-        List<Bin> con = Arrays.asList(b);
+            Map<Dimension, Color> colors, AbstractBin<?>... b) {
+        List<AbstractBin<?>> con = Arrays.asList(b);
         javax.vecmath.Point3f startPointer3D = new Point3f(
                 -(translate(con.get(0).w()) * con.size() + (con.size() - 1) * 0.1f) / 2, -translate(con.get(0).h()) / 2,
                 -translate(con.get(0).l()) / 2);

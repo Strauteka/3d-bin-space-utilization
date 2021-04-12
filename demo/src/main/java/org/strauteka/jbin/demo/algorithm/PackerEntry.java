@@ -17,38 +17,45 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.strauteka.jbin.core.AbstractBin;
 import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class PackerEntry {
-    public static List<Bin> calculate(int iterations, int calcSec) {
-        final List<Bin> bins = getBins();
-        final boolean isFullSpace = false;
+    public static List<AbstractBin<?>> calculate(int iterations, int calcSec) {
         final boolean isRndItems = true;
-        final long customSize = (long) ((isFullSpace ? bins.stream().map(e -> e.value()).reduce(0l, Long::sum)
-                : bins.get(0).value()));
-        final List<Item> items = isRndItems ? getRandomItems(20, 200, 700, customSize) : getStaticItems();
+        final List<ItemImpl> items = isRndItems ? getRandomItems(20, 200, 700, new Size(5900, 2380, 2345).value())
+                : getStaticItems();
+        return calculate(iterations, calcSec,
+                getBins().stream().map(e -> (AbstractBin<?>) e).collect(Collectors.toList()),
+                getPallets().stream().map(e -> (AbstractBin<?>) e).collect(Collectors.toList()),
+                items.stream().map(e -> Tuple2.of(e, 0)).collect(Collectors.toList()));
+    }
 
-        List<Tuple2<Item, Integer>> itemsUtil = items.stream().map(e -> Tuple2.of(e, 0)).collect(Collectors.toList());
-        List<Bin> binCollector = new ArrayList<>();
-        for (Bin bin : bins) {
-            final long ItemSpace = itemsUtil.stream().map(e -> e._1.value() * (e._1.qty() - e._2)).reduce(0l,
-                    Long::sum);
-            System.out.println("Starting rat-race for Bin:" + bin + "\nCalculation Items:"
-                    + (Double.valueOf(ItemSpace) / Double.valueOf(bin.value())) + "%");
-            Tuple2<Bin, List<Tuple2<Item, Integer>>> tmp = PackerParallel.calculate(iterations, calcSec, bin,
-                    itemsUtil);
-            binCollector.add(tmp._1);
-            itemsUtil = tmp._2;
+    public static List<AbstractBin<?>> calculate(int iterations, int calcSec, List<AbstractBin<?>> bins,
+            List<AbstractBin<?>> pallets, List<Tuple2<ItemImpl, Integer>> items) {
+
+        if (!pallets.isEmpty()) {
+            Tuple2<List<AbstractBin<?>>, List<Tuple2<ItemImpl, Integer>>> calcPallets = calc(calcSec, iterations,
+                    pallets, items);
+            items = Stream
+                    .concat(calcPallets._1.stream().filter(
+                            e -> e.cargo().stream().filter(x -> (x.cargo() instanceof ItemImpl)).findAny().isPresent())
+                            .map(e -> Tuple2.<ItemImpl, Integer>of((ItemImpl) e, 0)), calcPallets._2.stream())
+                    .collect(Collectors.toList());
         }
 
-        for (Bin bin : binCollector) {
-            // Todo: deepDive in bin!
+        Tuple2<List<AbstractBin<?>>, List<Tuple2<ItemImpl, Integer>>> binCollector = calc(calcSec, iterations, bins,
+                items);
+
+        for (AbstractBin<?> bin : binCollector._1) {
+            // Todo: deepDive in bin! get value!
             long cargoSpace = bin.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum);
             System.out.println("Items added to bins: " + bin + " || "
                     + (Double.valueOf(cargoSpace) / Double.valueOf(bin.value())) + "%");
-            bin.cargo().stream().map(e -> Tuple2.of((Item) e.cargo(), e.stack().value()))
+            bin.cargo().stream().filter(e -> e.cargo() instanceof Item)
+                    .map(e -> Tuple2.of((Item) e.cargo(), e.stack().value()))
                     .collect(Collectors.groupingBy(e -> e._1, collector))//
                     .entrySet().stream().map(e -> Tuple2.of(e.getKey(), e.getValue().get(e.getKey())))
                     .forEach(e -> System.out
@@ -56,25 +63,67 @@ public class PackerEntry {
         }
 
         System.out.println("Items Left:");
-        itemsUtil.stream().filter(e -> e._1.qty() > e._2).forEach(
+        binCollector._2.stream().filter(e -> e._1.qty() > e._2).forEach(
                 e -> System.out.println(e._1 + " -- " + e._1.qty() + " || " + e._2 + " :: " + (e._1.qty() - e._2)));
-        return binCollector;
+        return binCollector._1;
     }
 
-    private static List<Bin> getBins() {
-        List<Bin> collector = new ArrayList<>();
+    public static Tuple2<List<AbstractBin<?>>, List<Tuple2<ItemImpl, Integer>>> calc(int calcSec, int iterations,
+            List<AbstractBin<?>> bins, List<Tuple2<ItemImpl, Integer>> items) {
+        List<AbstractBin<?>> binCollector = new ArrayList<>();
+        List<Tuple2<ItemImpl, Integer>> itemsNext = items;
+        for (AbstractBin<?> bin : bins) {
+            Tuple2<AbstractBin<?>, List<Tuple2<ItemImpl, Integer>>> tmp = PackerParallel.calculate(iterations, calcSec,
+                    bin, itemsNext);
+            binCollector = Stream.concat(binCollector.stream(), Stream.of(tmp._1)).collect(Collectors.toList());
+            itemsNext = tmp._2;
+        }
+        return Tuple2.of(binCollector, itemsNext);
+    }
+
+    private static List<AbstractBin<Bin>> getBins() {
+        List<AbstractBin<Bin>> collector = new ArrayList<>();
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
-        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(new Bin(new Size(5900, 2380, 2345), new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(new Bin(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(new Bin(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
         return collector;
     }
 
-    private static List<Item> getStaticItems() {
-        List<Item> collector = new ArrayList<>();
-        collector.add(new Item(400, 500, 1000, 10));
-        collector.add(new Item(567, 532, 538, 10));
-        collector.add(new Item(359, 265, 129, 50));
+    private static List<AbstractBin<Pallet>> getPallets() {
+        List<AbstractBin<Pallet>> collector = new ArrayList<>();
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
+        return collector;
+    }
+
+    private static List<ItemImpl> getStaticItems() {
+        List<ItemImpl> collector = new ArrayList<>();
+        collector.add(new Item(400, 500, 1000, 1, true, true, true, 3));
+        collector.add(new Item(567, 532, 538, 1, true, true, true, 2));
+        collector.add(new Item(359, 265, 129, 1, true, false, false, 1));
         // collector.add(new Item(760, 300, 450, 50));
         // collector.add(new Item(300, 300, 300, 50));
         // collector.add(new Item(400, 500, 1600, 10));
@@ -90,14 +139,14 @@ public class PackerEntry {
         return collector;
     }
 
-    private static List<Item> getRandomItems(int itemQty, int f, int t, long maxSpace) {
+    private static List<ItemImpl> getRandomItems(int itemQty, int f, int t, long maxSpace) {
         final Random rnd = new Random();
         return IntStream.range(0, itemQty)
                 .mapToObj(e -> new Size(itemSize(f, t, rnd), itemSize(f, t, rnd), itemSize(f, t, rnd)))
                 .map(e -> itemSize(itemQty, e, maxSpace, rnd)).collect(Collectors.toList());
     }
 
-    private static Item itemSize(int itemQty, Size size, long maxSpace, Random rnd) {
+    private static ItemImpl itemSize(int itemQty, Size size, long maxSpace, Random rnd) {
         int qty = Math.round((maxSpace * 1.0f / itemQty) / (size.value()));
         return new Item(size, (qty < 1 ? 1 : qty));
     }

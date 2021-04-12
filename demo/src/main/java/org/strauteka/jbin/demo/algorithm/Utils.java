@@ -2,6 +2,7 @@ package org.strauteka.jbin.demo.algorithm;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.Space;
 
@@ -34,7 +35,7 @@ public class Utils {
         return value ? 1 : 0;
     }
 
-    public static Size maxQtyOnDimension(Space space, Size size) {
+    public static Size maxQtyOnDimension(Space space, Dimension size) {
         return new Size(space.l() / size.l(), space.h() / size.h(), space.w() / size.w());
     }
 
