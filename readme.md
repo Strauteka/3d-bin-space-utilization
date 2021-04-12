@@ -78,6 +78,10 @@ Notes:
 
 ![draw-demo6.jpg](./resources/draw-demo6.png)
 
+### Pallet support.
+
+![draw-demo7.jpg](./resources/draw-demo7.png)
+
 ## Problems with `java3d` libraries?
 
 You may find solution in java3d folder ;)
