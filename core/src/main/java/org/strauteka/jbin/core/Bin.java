@@ -30,26 +30,36 @@ public abstract class Bin<SELF extends Bin<SELF>> extends Size {
     public abstract SELF self();
 
     public SELF add(Cargo<? extends Dimension> cargo) {
-        return add(cargo, false);
+        return add(cargo, false, stackConfig);
     }
 
-    public abstract SELF add(Cargo<? extends Dimension> cargo, boolean disableTop);
+    public abstract SELF add(Cargo<? extends Dimension> cargo, boolean disableTop, StackConfig stackConfig);
 
-    protected List<Space> createSpace(List<Space> space, Cargo<? extends Dimension> cargo, boolean disableTop) {
+    protected List<Space> createFilterSpace(Cargo<? extends Dimension> cargo, boolean disableTop,
+            StackConfig stackConfig) {
+        return dropUnusableSpace(mergeAll(dropOverlapSpace(createSpace(space, cargo, disableTop)), stackConfig),
+                stackConfig.minimumSpaceSide());
+    }
+
+    protected List<Cargo<? extends Dimension>> createCargo(Cargo<? extends Dimension> cargo) {
+        return Stream.concat(this.cargo.stream(), Stream.of(cargo)).collect(Collectors.toList());
+    }
+
+    private List<Space> createSpace(List<Space> space, Cargo<? extends Dimension> cargo, boolean disableTop) {
         return Stream
                 .concat(space.stream().filter(e -> e.overlap(cargo)).map(e -> e.createSpace(cargo, disableTop))
                         .flatMap(e -> e.stream()).distinct(), space.stream().filter(e -> !e.overlap(cargo)))
                 .collect(Collectors.toList());
     }
 
-    protected List<Space> dropOverlapSpace(final List<Space> space) {
+    private List<Space> dropOverlapSpace(final List<Space> space) {
         return space.stream()
                 .filter(e -> !space.stream().filter(x -> !e.equals(x) && x.overlay(e)).findAny().isPresent())
                 .collect(Collectors.toList());
     }
 
-    protected List<Space> dropUnusableSpace(final List<Space> space) {
-        return space.stream().filter(e -> Math.min(Math.min(e.l(), e.h()), e.w()) > stackConfig.minimumSpaceSide())
+    private List<Space> dropUnusableSpace(final List<Space> space, int minimumSpaceSide) {
+        return space.stream().filter(e -> Math.min(Math.min(e.l(), e.h()), e.w()) > minimumSpaceSide)
                 .collect(Collectors.toList());
     }
 
@@ -65,21 +75,21 @@ public abstract class Bin<SELF extends Bin<SELF>> extends Size {
         return stackConfig;
     }
 
-    protected List<Space> mergeAll(List<Space> space) {
+    private List<Space> mergeAll(List<Space> space, StackConfig stackConfig) {
         if (stackConfig.disableMerge())
             return space;
-        final List<Space> mergedItems = merge(space);
+        final List<Space> mergedItems = merge(space, stackConfig);
         if (!mergedItems.isEmpty())
             return mergeAll(Stream
                     .concat(mergedItems.stream(),
                             space.stream()
                                     .filter(e -> !mergedItems.stream().filter(x -> x.overlay(e)).findAny().isPresent()))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList()), stackConfig);
 
         return space;
     }
 
-    private List<Space> merge(List<Space> space) {
+    private List<Space> merge(List<Space> space, StackConfig stackConfig) {
         return space.stream().map(e -> space.stream()//
                 .filter(x -> !e.equals(x))//
                 .filter(x -> e.needToCombineSpace(x, stackConfig))//

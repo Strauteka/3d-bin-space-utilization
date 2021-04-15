@@ -1,8 +1,6 @@
 package org.strauteka.jbin.demo.algorithm;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.strauteka.jbin.core.Bin;
@@ -17,8 +15,7 @@ public class Pallet extends Bin<Pallet> implements ItemImpl {
     public final Rotation[] rotations;
 
     private Pallet(Pallet pallet, StackConfig overStack) {
-        this(pallet, Optional.ofNullable(overStack).orElseGet(() -> pallet.stackConfig()), pallet.emptySpace(),
-                pallet.cargo());
+        this(pallet, overStack, pallet.emptySpace(), pallet.cargo());
     }
 
     private Pallet(int l, int h, int w) {
@@ -30,7 +27,7 @@ public class Pallet extends Bin<Pallet> implements ItemImpl {
     }
 
     private Pallet(Dimension size) {
-        this(size, new StackConfig(0, 0, 0, 0, 0, false));
+        this(size, null);
     }
 
     private Pallet(Dimension size, StackConfig overStack) {
@@ -51,11 +48,9 @@ public class Pallet extends Bin<Pallet> implements ItemImpl {
     }
 
     @Override
-    public Pallet add(Cargo<? extends Dimension> cargo, boolean disableTop) {
-        return new Pallet(this, super.stackConfig(),
-                super.dropUnusableSpace(super.mergeAll(
-                        super.dropOverlapSpace(super.createSpace(super.emptySpace(), cargo, disableTop)))),
-                Stream.concat(super.cargo().stream(), Stream.of(cargo)).collect(Collectors.toList()));
+    public Pallet add(Cargo<? extends Dimension> cargo, boolean disableTop, StackConfig stackConfig) {
+        return new Pallet(this, super.stackConfig(), super.createFilterSpace(cargo, disableTop, stackConfig),
+                super.createCargo(cargo));
     }
 
     @Override

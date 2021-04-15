@@ -12,7 +12,7 @@ import java.awt.Color;
 
 public class App {
     public static void main(String[] args) {
-        // Development.draw();
+        Development.draw();
         // Demo.drawRotations();
         Demo.draw();
         final long l = System.currentTimeMillis();

@@ -39,7 +39,7 @@ public class PackerUnit {
 
         final Cargo<? extends Dimension> cargo = optCargo.get();
         final ItemImpl cargoItem = (ItemImpl) cargo.cargo();
-        final Bin<?> nextBin = bin.add(cargo, cargoItem instanceof Pallet);
+        final Bin<?> nextBin = bin.add(cargo, cargoItem instanceof Pallet, bin.stackConfig());
         final List<Tuple2<ItemImpl, Integer>> next = Stream
                 .concat(itemUtilize.stream().filter(e -> !e._1.equals(cargoItem)), //
                         itemUtilize.stream().filter(e -> e._1.equals(cargoItem))

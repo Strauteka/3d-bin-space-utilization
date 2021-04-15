@@ -1,9 +1,6 @@
 package org.strauteka.jbin.demo.algorithm;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
@@ -19,7 +16,7 @@ public class Container extends Bin<Container> {
     }
 
     public Container(Container bin, StackConfig overStack) {
-        super(bin, Optional.ofNullable(overStack).orElseGet(() -> bin.stackConfig()), bin.emptySpace(), bin.cargo());
+        super(bin, overStack, bin.emptySpace(), bin.cargo());
     }
 
     public Container(int l, int h, int w) {
@@ -31,7 +28,7 @@ public class Container extends Bin<Container> {
     }
 
     public Container(Dimension size) {
-        this(size, new StackConfig(0, 0, 0, 0, 0, false));
+        this(size, null);
     }
 
     public Container(Dimension size, StackConfig overStack) {
@@ -43,11 +40,9 @@ public class Container extends Bin<Container> {
     }
 
     @Override
-    public Container add(Cargo<? extends Dimension> cargo, boolean disableTop) {
-        return new Container(this, super.stackConfig(),
-                super.dropUnusableSpace(super.mergeAll(
-                        super.dropOverlapSpace(super.createSpace(super.emptySpace(), cargo, disableTop)))),
-                Stream.concat(super.cargo().stream(), Stream.of(cargo)).collect(Collectors.toList()));
+    public Container add(Cargo<? extends Dimension> cargo, boolean disableTop, StackConfig stackConfig) {
+        return new Container(this, super.stackConfig(), super.createFilterSpace(cargo, disableTop, stackConfig),
+                super.createCargo(cargo));
     }
 
     @Override
