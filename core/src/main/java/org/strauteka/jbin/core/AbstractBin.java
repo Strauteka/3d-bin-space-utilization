@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Arrays;
 
-import org.strauteka.jbin.core.Utils.Rotation;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
 public abstract class AbstractBin<SELF extends AbstractBin<SELF>> extends Size {
@@ -90,10 +89,5 @@ public abstract class AbstractBin<SELF extends AbstractBin<SELF>> extends Size {
                 .collect(Collectors.toList());
     }
 
-    public Bin binRotate(Rotation rotation) {
-        return this.cargo().stream().reduce(new Bin(rotate(rotation), this.stackConfig),
-                (bin, cargo) -> bin.add(Utils.cargoRotate((Size) bin, rotation, cargo)), (bin1, bin2) -> {
-                    throw new UnsupportedOperationException();
-                });
-    }
+    public abstract SELF binRotate(Rotation rotation);
 }

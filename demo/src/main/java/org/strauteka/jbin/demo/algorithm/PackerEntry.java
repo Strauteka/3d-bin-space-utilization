@@ -18,7 +18,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.strauteka.jbin.core.AbstractBin;
-import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
@@ -92,12 +91,6 @@ public class PackerEntry {
 
     private static List<AbstractBin<Pallet>> getPallets() {
         List<AbstractBin<Pallet>> collector = new ArrayList<>();
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
         collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
         collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
         collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));

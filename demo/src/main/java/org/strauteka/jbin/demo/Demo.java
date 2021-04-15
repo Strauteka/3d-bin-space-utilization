@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.awt.Color;
-import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
-import org.strauteka.jbin.core.Utils.Rotation;
+import org.strauteka.jbin.core.Rotation;
+import org.strauteka.jbin.demo.algorithm.Bin;
 import org.strauteka.jbin.demo.algorithm.Pallet;
 import org.strauteka.jbin.draw3d.Draw3d;
 

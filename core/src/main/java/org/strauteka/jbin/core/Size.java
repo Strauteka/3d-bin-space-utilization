@@ -2,8 +2,6 @@ package org.strauteka.jbin.core;
 
 import java.util.stream.Stream;
 
-import org.strauteka.jbin.core.Utils.Rotation;
-
 public class Size implements Dimension {
     private final int l;
     private final int h;

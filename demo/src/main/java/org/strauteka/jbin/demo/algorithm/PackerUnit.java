@@ -11,7 +11,7 @@ import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.Space;
-import org.strauteka.jbin.core.Utils.Rotation;
+import org.strauteka.jbin.core.Rotation;
 
 public class PackerUnit {
 

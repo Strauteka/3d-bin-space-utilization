@@ -8,7 +8,6 @@ import com.sun.j3d.utils.behaviors.mouse.MouseWheelZoom;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 
 import org.strauteka.jbin.core.AbstractBin;
-import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Space;
@@ -454,7 +453,7 @@ public class Draw3d<T extends Space> extends JPanel {
         return (float) value / 1000;
     }
 
-    public static void draw(Bin... b) {
+    public static void draw(AbstractBin<?>... b) {
         draw(false, false, 1200, 800, null, b);
     }
 

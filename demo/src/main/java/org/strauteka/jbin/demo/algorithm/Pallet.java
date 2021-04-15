@@ -10,7 +10,7 @@ import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.Space;
-import org.strauteka.jbin.core.Utils.Rotation;
+import org.strauteka.jbin.core.Rotation;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class Pallet extends AbstractBin<Pallet> implements ItemImpl {
@@ -91,5 +91,13 @@ public class Pallet extends AbstractBin<Pallet> implements ItemImpl {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public Pallet binRotate(Rotation rotation) {
+        return this.cargo().stream().reduce(new Pallet(rotate(rotation), this.stackConfig()),
+                (bin, cargo) -> bin.add(cargo.cargoRotate(bin, rotation)), (bin1, bin2) -> {
+                    throw new UnsupportedOperationException();
+                });
     }
 }

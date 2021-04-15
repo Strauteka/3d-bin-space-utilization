@@ -3,11 +3,11 @@ package org.strauteka.jbin.demo;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Size;
-import org.strauteka.jbin.core.Utils.Rotation;
+import org.strauteka.jbin.core.Rotation;
 import org.strauteka.jbin.core.configuration.StackConfig;
+import org.strauteka.jbin.demo.algorithm.Bin;
 import org.strauteka.jbin.demo.algorithm.Pallet;
 import org.strauteka.jbin.draw3d.Draw3d;
 
@@ -15,9 +15,9 @@ public class Development {
 
     public static void draw() {
         List<Bin> bins = new ArrayList<>();
-        bins.add(test2());
-        bins.add(test3());
-        bins.add(test4());
+        // bins.add(test2());
+        // bins.add(test3());
+        // bins.add(test4());
         bins.add(test7());
         Draw3d.draw(bins.toArray(new Bin[0]));
     }

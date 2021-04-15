@@ -1,7 +1,7 @@
 package org.strauteka.jbin.demo.algorithm;
 
 import org.strauteka.jbin.core.Dimension;
-import org.strauteka.jbin.core.Utils.Rotation;
+import org.strauteka.jbin.core.Rotation;
 
 public interface ItemImpl extends Dimension {
 

@@ -29,26 +29,10 @@ Notes:
 - Compile: `mvn clean install`
 - Run Demo: `java -jar .\demo\target\demo-jar-with-dependencies.jar`
 
-## Include in project:
-
-```
-...
-<dependency>
-  <groupId>org.strauteka.3d-bin-space-utilization</groupId>
-  <artifactId>space-utilization-core</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
-</dependency>
-<dependency>
-  <groupId>org.strauteka.3d-bin-space-utilization</groupId>
-  <artifactId>draw-3d</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
-</dependency>
-...
-```
-
 # Requires
 
 - Java 1.8
+- Maven
 
 ## Preview core
 

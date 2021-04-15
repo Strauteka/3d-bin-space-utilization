@@ -1,10 +1,16 @@
-package org.strauteka.jbin.core;
+package org.strauteka.jbin.demo.algorithm;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.strauteka.jbin.core.AbstractBin;
+import org.strauteka.jbin.core.Cargo;
+import org.strauteka.jbin.core.Dimension;
+import org.strauteka.jbin.core.Rotation;
+import org.strauteka.jbin.core.Size;
+import org.strauteka.jbin.core.Space;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class Bin extends AbstractBin<Bin> {
@@ -47,5 +53,13 @@ public class Bin extends AbstractBin<Bin> {
     @Override
     public Bin self() {
         return this;
+    }
+
+    @Override
+    public Bin binRotate(Rotation rotation) {
+        return this.cargo().stream().reduce(new Bin(rotate(rotation), this.stackConfig()),
+                (bin, cargo) -> bin.add(cargo.cargoRotate(bin, rotation)), (bin1, bin2) -> {
+                    throw new UnsupportedOperationException();
+                });
     }
 }

@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
-import org.strauteka.jbin.core.Utils.Rotation;
+import org.strauteka.jbin.core.Rotation;
 
 public class Item extends Size implements ItemImpl {
     private final int qty;
