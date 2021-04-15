@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.strauteka.jbin.core.AbstractBin;
+import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
@@ -15,7 +15,7 @@ import org.strauteka.jbin.core.Rotation;
 
 public class PackerUnit {
 
-    public static Tuple2<AbstractBin<?>, List<Tuple2<ItemImpl, Integer>>> pack(AbstractBin<?> bin,
+    public static Tuple2<Bin<?>, List<Tuple2<ItemImpl, Integer>>> pack(Bin<?> bin,
             List<Tuple2<ItemImpl, Integer>> items, long stop, int id) {
         if (System.currentTimeMillis() >= stop)
             return Tuple2.of(bin, items);
@@ -24,7 +24,7 @@ public class PackerUnit {
                 items.stream().map(e -> e._1.priority()).distinct().sorted().collect(Collectors.toList()), id);
     }
 
-    private static Tuple2<AbstractBin<?>, List<Tuple2<ItemImpl, Integer>>> packRecursive(AbstractBin<?> bin,
+    private static Tuple2<Bin<?>, List<Tuple2<ItemImpl, Integer>>> packRecursive(Bin<?> bin,
             List<Tuple2<ItemImpl, Integer>> itemUtilize, List<Integer> priority, int id) {
         final int prior = priority.get(0);
         final Optional<Cargo<? extends Dimension>> optCargo = findCargo(bin.emptySpace(), itemUtilize.stream()
@@ -39,7 +39,7 @@ public class PackerUnit {
 
         final Cargo<? extends Dimension> cargo = optCargo.get();
         final ItemImpl cargoItem = (ItemImpl) cargo.cargo();
-        final AbstractBin<?> nextBin = bin.add(cargo, cargoItem instanceof Pallet);
+        final Bin<?> nextBin = bin.add(cargo, cargoItem instanceof Pallet);
         final List<Tuple2<ItemImpl, Integer>> next = Stream
                 .concat(itemUtilize.stream().filter(e -> !e._1.equals(cargoItem)), //
                         itemUtilize.stream().filter(e -> e._1.equals(cargoItem))

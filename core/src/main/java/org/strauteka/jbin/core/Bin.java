@@ -11,16 +11,15 @@ import java.util.Arrays;
 
 import org.strauteka.jbin.core.configuration.StackConfig;
 
-public abstract class AbstractBin<SELF extends AbstractBin<SELF>> extends Size {
+public abstract class Bin<SELF extends Bin<SELF>> extends Size {
 
     private final StackConfig stackConfig;
     private final List<Cargo<? extends Dimension>> cargo;
     private final List<Space> space;
 
-    public AbstractBin(Dimension size, StackConfig overStack, List<Space> space,
-            List<Cargo<? extends Dimension>> cargo) {
+    public Bin(Dimension size, StackConfig overStack, List<Space> space, List<Cargo<? extends Dimension>> cargo) {
         super(size);
-        this.stackConfig = overStack;
+        this.stackConfig = Optional.ofNullable(overStack).orElseGet(() -> new StackConfig(0, 0, 0, 0, 0, false));
         this.cargo = Collections.unmodifiableList(Optional.ofNullable(cargo)
                 .orElseGet(() -> new ArrayList<Cargo<? extends Dimension>>()).stream().collect(Collectors.toList()));
         this.space = Collections.unmodifiableList(Optional.ofNullable(space)

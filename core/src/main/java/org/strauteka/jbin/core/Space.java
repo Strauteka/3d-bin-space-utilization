@@ -161,6 +161,9 @@ public class Space extends Size {
 
     @Override
     public boolean equals(Object o) {
+        if (o == null)
+            return false;
+
         if (o == this)
             return true;
 
@@ -180,5 +183,4 @@ public class Space extends Size {
         return String.format("l: %d; h: %d; w: %d; Positions: %s; l__ %d; h__ %d; w__ %d;", l(), h(), w(),
                 position.toString(), l__(), h__(), w__());
     }
-
 }

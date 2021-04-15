@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.strauteka.jbin.core.AbstractBin;
+import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Cargo;
 import org.strauteka.jbin.core.Dimension;
 import org.strauteka.jbin.core.Size;
@@ -13,7 +13,7 @@ import org.strauteka.jbin.core.Space;
 import org.strauteka.jbin.core.Rotation;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
-public class Pallet extends AbstractBin<Pallet> implements ItemImpl {
+public class Pallet extends Bin<Pallet> implements ItemImpl {
     public final Rotation[] rotations;
 
     private Pallet(Pallet pallet, StackConfig overStack) {

@@ -17,27 +17,26 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.strauteka.jbin.core.AbstractBin;
+import org.strauteka.jbin.core.Bin;
 import org.strauteka.jbin.core.Size;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class PackerEntry {
-    public static List<AbstractBin<?>> calculate(int iterations, int calcSec) {
+    public static List<Bin<?>> calculate(int iterations, int calcSec) {
         final boolean isRndItems = true;
         final List<ItemImpl> items = isRndItems ? getRandomItems(20, 200, 700, new Size(5900, 2380, 2345).value())
                 : getStaticItems();
-        return calculate(iterations, calcSec,
-                getBins().stream().map(e -> (AbstractBin<?>) e).collect(Collectors.toList()),
-                getPallets().stream().map(e -> (AbstractBin<?>) e).collect(Collectors.toList()),
+        return calculate(iterations, calcSec, getBins().stream().map(e -> (Bin<?>) e).collect(Collectors.toList()),
+                getPallets().stream().map(e -> (Bin<?>) e).collect(Collectors.toList()),
                 items.stream().map(e -> Tuple2.of(e, 0)).collect(Collectors.toList()));
     }
 
-    public static List<AbstractBin<?>> calculate(int iterations, int calcSec, List<AbstractBin<?>> bins,
-            List<AbstractBin<?>> pallets, List<Tuple2<ItemImpl, Integer>> items) {
+    public static List<Bin<?>> calculate(int iterations, int calcSec, List<Bin<?>> bins, List<Bin<?>> pallets,
+            List<Tuple2<ItemImpl, Integer>> items) {
 
         if (!pallets.isEmpty()) {
-            Tuple2<List<AbstractBin<?>>, List<Tuple2<ItemImpl, Integer>>> calcPallets = calc(calcSec, iterations,
-                    pallets, items);
+            Tuple2<List<Bin<?>>, List<Tuple2<ItemImpl, Integer>>> calcPallets = calc(calcSec, iterations, pallets,
+                    items);
             items = Stream
                     .concat(calcPallets._1.stream().filter(
                             e -> e.cargo().stream().filter(x -> (x.cargo() instanceof ItemImpl)).findAny().isPresent())
@@ -45,10 +44,9 @@ public class PackerEntry {
                     .collect(Collectors.toList());
         }
 
-        Tuple2<List<AbstractBin<?>>, List<Tuple2<ItemImpl, Integer>>> binCollector = calc(calcSec, iterations, bins,
-                items);
+        Tuple2<List<Bin<?>>, List<Tuple2<ItemImpl, Integer>>> binCollector = calc(calcSec, iterations, bins, items);
 
-        for (AbstractBin<?> bin : binCollector._1) {
+        for (Bin<?> bin : binCollector._1) {
             // Todo: deepDive in bin! get value!
             long cargoSpace = bin.cargo().stream().map(x -> x.value()).reduce(0l, Long::sum);
             System.out.println("Items added to bins: " + bin + " || "
@@ -67,30 +65,30 @@ public class PackerEntry {
         return binCollector._1;
     }
 
-    public static Tuple2<List<AbstractBin<?>>, List<Tuple2<ItemImpl, Integer>>> calc(int calcSec, int iterations,
-            List<AbstractBin<?>> bins, List<Tuple2<ItemImpl, Integer>> items) {
-        List<AbstractBin<?>> binCollector = new ArrayList<>();
+    public static Tuple2<List<Bin<?>>, List<Tuple2<ItemImpl, Integer>>> calc(int calcSec, int iterations,
+            List<Bin<?>> bins, List<Tuple2<ItemImpl, Integer>> items) {
+        List<Bin<?>> binCollector = new ArrayList<>();
         List<Tuple2<ItemImpl, Integer>> itemsNext = items;
-        for (AbstractBin<?> bin : bins) {
-            Tuple2<AbstractBin<?>, List<Tuple2<ItemImpl, Integer>>> tmp = PackerParallel.calculate(iterations, calcSec,
-                    bin, itemsNext);
+        for (Bin<?> bin : bins) {
+            Tuple2<Bin<?>, List<Tuple2<ItemImpl, Integer>>> tmp = PackerParallel.calculate(iterations, calcSec, bin,
+                    itemsNext);
             binCollector = Stream.concat(binCollector.stream(), Stream.of(tmp._1)).collect(Collectors.toList());
             itemsNext = tmp._2;
         }
         return Tuple2.of(binCollector, itemsNext);
     }
 
-    private static List<AbstractBin<Bin>> getBins() {
-        List<AbstractBin<Bin>> collector = new ArrayList<>();
+    private static List<Bin<Container>> getBins() {
+        List<Bin<Container>> collector = new ArrayList<>();
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
         // collector.add(new Bin(new Size(5900, 2380, 2345)));
-        collector.add(new Bin(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(new Bin(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(new Container(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(new Container(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
         return collector;
     }
 
-    private static List<AbstractBin<Pallet>> getPallets() {
-        List<AbstractBin<Pallet>> collector = new ArrayList<>();
+    private static List<Bin<Pallet>> getPallets() {
+        List<Bin<Pallet>> collector = new ArrayList<>();
         collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
         collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
         collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
