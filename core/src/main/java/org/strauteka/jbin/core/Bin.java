@@ -3,6 +3,7 @@ package org.strauteka.jbin.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,8 +38,19 @@ public abstract class Bin<SELF extends Bin<SELF>> extends Size {
 
     protected List<Space> createFilterSpace(Cargo<? extends Dimension> cargo, boolean disableTop,
             StackConfig stackConfig) {
-        return dropUnusableSpace(mergeAll(dropOverlapSpace(createSpace(space, cargo, disableTop)), stackConfig),
-                stackConfig.minimumSpaceSide());
+        final Space affectedArea = new Space(cargo.l() + (stackConfig.l() * 2), cargo.h(),
+                cargo.w() + (stackConfig.w() * 2), cargo.l_() - stackConfig.l(), cargo.h_(),
+                cargo.w_() - stackConfig.w());
+        final Map<Boolean, List<Space>> splitAffectedSpace = space.stream()
+                .collect(Collectors.groupingBy(e -> affectedArea.overlapIncluded(e), Collectors.toList()));
+        return Stream
+                .concat(splitAffectedSpace.entrySet().stream().filter(e -> !e.getKey())
+                        .flatMap(e -> e.getValue().stream()),
+                        dropUnusableSpace(dropOverlapSpace(
+                                mergeAll(createSpace(splitAffectedSpace.getOrDefault(true, new ArrayList<>()), cargo,
+                                        disableTop), stackConfig)),
+                                stackConfig.minimumSpaceSide()).stream())
+                .collect(Collectors.toList());
     }
 
     protected List<Cargo<? extends Dimension>> createCargo(Cargo<? extends Dimension> cargo) {

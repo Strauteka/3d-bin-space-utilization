@@ -62,6 +62,12 @@ public class Space extends Size {
                 && l_() < s.l__() && l__() > s.l_());
     }
 
+    public Boolean overlapIncluded(Space s) {
+        return (h_() <= s.h__() && h__() >= s.h_() //
+                && w_() <= s.w__() && w__() >= s.w_() //
+                && l_() <= s.l__() && l__() >= s.l_());
+    }
+
     public Size overlapSize(Space s) {
         return new Size(Math.min(l__(), s.l__()) - Math.max(l_(), s.l_()), //
                 Math.min(h__(), s.h__()) - Math.max(h_(), s.h_()), //

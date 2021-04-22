@@ -15,10 +15,10 @@ public class Development {
 
     public static void draw() {
         List<Container> bins = new ArrayList<>();
-        // bins.add(test2());
-        // bins.add(test3());
-        // bins.add(test4());
-        bins.add(test7());
+        bins.add(test2());
+        bins.add(test3());
+        bins.add(test4());
+        // bins.add(test7());
         Draw3d.draw(bins.toArray(new Container[0]));
     }
 
