@@ -20,7 +20,7 @@ public abstract class Bin<SELF extends Bin<SELF>> extends Size {
 
     public Bin(Dimension size, StackConfig overStack, List<Space> space, List<Cargo<? extends Dimension>> cargo) {
         super(size);
-        this.stackConfig = Optional.ofNullable(overStack).orElseGet(() -> new StackConfig(0, 0, 0, 0, 0, false));
+        this.stackConfig = Optional.ofNullable(overStack).orElseGet(() -> new StackConfig(0, 0, 0, 0, 0, 0, false));
         this.cargo = Collections.unmodifiableList(Optional.ofNullable(cargo)
                 .orElseGet(() -> new ArrayList<Cargo<? extends Dimension>>()).stream().collect(Collectors.toList()));
         this.space = Collections.unmodifiableList(Optional.ofNullable(space)
@@ -38,7 +38,7 @@ public abstract class Bin<SELF extends Bin<SELF>> extends Size {
 
     protected List<Space> createFilterSpace(Cargo<? extends Dimension> cargo, boolean disableTop,
             StackConfig stackConfig) {
-        final Space affectedArea = new Space(cargo.l() + (stackConfig.l() * 2), cargo.h(),
+        final Space affectedArea = new Space(cargo.l() + (stackConfig.l() * 2), cargo.h() + stackConfig.equalizeH(),
                 cargo.w() + (stackConfig.w() * 2), cargo.l_() - stackConfig.l(), cargo.h_(),
                 cargo.w_() - stackConfig.w());
         final Map<Boolean, List<Space>> splitAffectedSpace = space.stream()

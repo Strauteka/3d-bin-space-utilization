@@ -12,7 +12,7 @@ Notes:
 
 - Coordinates for `Bin` starts at (`0,0,0`):[`length, height, width`] and goes till defined bin size.
 
-- Each time, when adding `Cargo` to `Bin` core will create `new unmodifiable Bin` with added cargo to it.
+- Each time, when adding `Cargo` to `Bin` you have to create `new unmodifiable Bin` with added cargo to it (Example in demo algorithm).
 
 - Core does not provide any restrictions when adding cargo, cargo can overlap, if not respected empty space.
 

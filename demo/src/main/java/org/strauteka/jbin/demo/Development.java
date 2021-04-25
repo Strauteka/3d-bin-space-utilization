@@ -23,7 +23,7 @@ public class Development {
     }
 
     public static Container test3() {
-        return new Container(1000, 1000, 1000, new StackConfig(20, 50, 20, 50, 50, false))
+        return new Container(1000, 1000, 1000, new StackConfig(20, 50, 20, 50, 10, 50, false))
                 .add(new Cargo<Size>(new Size(900, 200, 900), new Size(50, 0, 50)));
     }
 
@@ -37,10 +37,12 @@ public class Development {
     }
 
     public static Container test4() {
-        return new Container(1000, 700, 1000, new StackConfig(20, 1000, 20, 1000, 0, false))
+        return new Container(1000, 700, 1000, new StackConfig(20, 1000, 20, 1000, 5, 0, false))
                 .add(new Cargo<Size>(new Size(300, 200, 400), new Size(150, 0, 150)))
                 .add(new Cargo<Size>(new Size(200, 200, 300), new Size(200, 0, 550)))
-                .add(new Cargo<Size>(new Size(200, 200, 200), new Size(480, 0, 150)));
+                .add(new Cargo<Size>(new Size(200, 200, 200), new Size(480, 0, 150)))
+                .add(new Cargo<Size>(new Size(100, 195, 200), new Size(700, 0, 150)))
+                .add(new Cargo<Size>(new Size(100, 190, 200), new Size(800, 0, 150)));
     }
 
     public static Container test7() {

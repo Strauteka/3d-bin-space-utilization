@@ -114,12 +114,13 @@ public class Space extends Size {
 
     public boolean needToCombineSpace(Space s, StackConfig conf) {
         final Size os = overlapSize(s);
+        final boolean hOK = Math.abs(h_() - s.h_()) <= conf.equalizeH();
         return this.w__() == s.w_() && os.l() > 0 && os.h() > 0 // combine near in side
-                && ((h_() < s.h_() ? w() : s.w()) <= conf.w_() || h_() == s.h_()) //
+                && ((h_() < s.h_() ? w() : s.w()) <= conf.w_() || hOK) // checks if bellow space.w is narrow
                 || this.l__() == s.l_() && os.w() > 0 && os.h() > 0// combine near in front
-                        && ((h_() < s.h_() ? l() : s.l()) <= conf.l_() || h_() == s.h_()) //
-                || os.w() > 0 && os.w() <= conf.w() && os.l() > 0 && os.h() > 0 && h_() == s.h_()// near extended side
-                || os.l() > 0 && os.l() <= conf.l() && os.w() > 0 && os.h() > 0 && h_() == s.h_();// near extended front
+                        && ((h_() < s.h_() ? l() : s.l()) <= conf.l_() || hOK) // checks if bellow space.l is narrow
+                || os.w() > 0 && os.w() <= conf.w() && os.l() > 0 && os.h() > 0 && hOK// near extended side
+                || os.l() > 0 && os.l() <= conf.l() && os.w() > 0 && os.h() > 0 && hOK;// near extended front
     }
 
     public Space combineSpace(Space space, StackConfig conf) {

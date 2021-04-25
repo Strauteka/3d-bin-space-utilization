@@ -80,34 +80,32 @@ public class PackerEntry {
 
     private static List<Bin<Container>> getBins() {
         List<Bin<Container>> collector = new ArrayList<>();
-        // collector.add(new Bin(new Size(5900, 2380, 2345)));
-        // collector.add(new Bin(new Size(5900, 2380, 2345)));
-        collector.add(new Container(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(new Container(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 100, false)));
+        collector.add(new Container(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        collector.add(new Container(5900, 2380, 2345, new StackConfig(100, 100, 100, 100, 5, 100, false)));
         return collector;
     }
 
     private static List<Bin<Pallet>> getPallets() {
-        List<Bin<Pallet>> collector = new ArrayList<>();
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        collector.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 100, false)));
-        return collector;
+        List<Bin<Pallet>> c = new ArrayList<>();
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        c.add(Pallet.pallet(new Size(1200, 2200, 800), 150, new StackConfig(100, 100, 100, 100, 5, 100, false)));
+        return c;
     }
 
     private static List<ItemImpl> getStaticItems() {
