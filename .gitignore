@@ -4,7 +4,7 @@ target
 .vscode
 .classpath
 .project
-
+.idea
 # Compiled class file
 *.class
 
