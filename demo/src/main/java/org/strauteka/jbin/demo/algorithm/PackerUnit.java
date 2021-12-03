@@ -60,7 +60,6 @@ public class PackerUnit {
     }
 
     private static Optional<Space> selectSpace(List<Space> spaces, List<Tuple2<Item, Integer>> itemUtilize, int id) {
-        //More time-consuming, but gives a little more efficiency
         final List<Dimension> uniqueRotatedDimensions = itemUtilize.stream()
                 .flatMap(tuple -> Stream.of(tuple._1.rotations())
                         .map(tuple._1::rotate))
@@ -69,7 +68,7 @@ public class PackerUnit {
 
         // filter off spaces that can't fit any item
         return spaces.stream()
-                        .filter(e -> uniqueRotatedDimensions.stream().anyMatch(e::fitAny))
+                        .filter(e -> uniqueRotatedDimensions.stream().anyMatch(e::fit))
                         .min(Comparator
                                 .comparingLong(e -> (id % 2 == 0 ? 1L : -1L) * Utils.concat(e.h_(), e.l_(), e.w_())));
 
