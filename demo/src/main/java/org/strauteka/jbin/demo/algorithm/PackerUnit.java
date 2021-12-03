@@ -2,7 +2,6 @@ package org.strauteka.jbin.demo.algorithm;
 
 import org.strauteka.jbin.core.*;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,11 @@ public class PackerUnit {
             return Tuple2.of(bin, items);
 
         return packRecursive(bin, items,
-                items.stream().map(e -> e._1.priority()).distinct().sorted().collect(Collectors.toList()), id);
+                items.stream()
+                        .map(e -> e._1.priority())
+                        .distinct()
+                        .sorted()
+                        .collect(Collectors.toList()), id);
     }
 
     private static Tuple2<Bin<?>, List<Tuple2<Item, Integer>>> packRecursive(Bin<?> bin,
@@ -68,33 +71,28 @@ public class PackerUnit {
 
         // filter off spaces that can't fit any item
         return spaces.stream()
-                        .filter(e -> uniqueRotatedDimensions.stream().anyMatch(e::fit))
-                        .min(Comparator
-                                .comparingLong(e -> (id % 2 == 0 ? 1L : -1L) * Utils.concat(e.h_(), e.l_(), e.w_())));
+                .filter(e -> uniqueRotatedDimensions.stream().anyMatch(e::fit))
+                .min(Comparator
+                        .comparingLong(e -> (id % 2 == 0 ? 1L : -1L) * Utils.concat(e.h_(), e.l_(), e.w_())));
 
     }
 
     private static Optional<Cargo<? extends Dimension>> createCargo(Space space,
                                                                     List<Tuple2<Item, Integer>> itemUtilize) {
         return itemUtilize.stream()
-                .map(e -> createCargo(space, e._1, e._2))
-                .flatMap(Collection::stream)
+                .flatMap(e -> createCargo(space, e._1, e._2))
                 .min(Comparator.comparingLong(e -> {
                     final Size s = space.subtract(e);
                     return Utils.concat(s.h(), s.w(), s.l(), 50);
                 }));
     }
 
-    private static List<Cargo<? extends Dimension>> createCargo(Space space, Item item, Integer qty) {
+    private static Stream<Cargo<? extends Dimension>> createCargo(Space space, Item item, Integer qtyUsed) {
         return Stream.of(item.rotations()).filter(e -> space.fit(item.rotate(e)))
-                .map(e -> buildCargoSwitch(space, item, qty, e)).flatMap(Collection::stream).collect(Collectors.toList());
-    }
-
-    private static List<Cargo<? extends Dimension>> buildCargoSwitch(Space space, Item item, Integer qtyUsed,
-                                                                     Rotation rotation) {
-        return Stream.of(buildCargoA(space, item, (item.qty() - qtyUsed), rotation),
-                buildCargoB(space, item, (item.qty() - qtyUsed), rotation),
-                buildCargoC(space, item, (item.qty() - qtyUsed), rotation)).collect(Collectors.toList());
+                .flatMap(rotation ->
+                        Stream.of(buildCargoA(space, item, (item.qty() - qtyUsed), rotation),
+                                buildCargoB(space, item, (item.qty() - qtyUsed), rotation),
+                                buildCargoC(space, item, (item.qty() - qtyUsed), rotation)));
     }
 
     private static Cargo<? extends Dimension> buildCargoC(Space space, Item item, Integer qtyLeft,
