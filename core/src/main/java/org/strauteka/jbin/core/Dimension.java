@@ -2,13 +2,13 @@ package org.strauteka.jbin.core;
 
 public interface Dimension {
 
-    public int l();
+    int l();
 
-    public int h();
+    int h();
 
-    public int w();
+    int w();
 
-    public Dimension rotate(Rotation rotation);
+    Dimension rotate(Rotation rotation);
 
-    public long value();
+    long value();
 }

@@ -49,7 +49,7 @@ public class Size implements Dimension {
 
     @Override
     public long value() {
-        return Long.valueOf(l()) * Long.valueOf(h()) * Long.valueOf(w());
+        return (long) l() * (long) h() * (long) w();
     }
 
     public Size subtract(Dimension dimension) {
@@ -57,7 +57,7 @@ public class Size implements Dimension {
     }
 
     public boolean fitAny(Dimension dimension) {
-        return Stream.of(Rotation.values()).map(e -> dimension.rotate(e)).filter(e -> fit(e)).findAny().isPresent();
+        return Stream.of(Rotation.values()).map(dimension::rotate).anyMatch(this::fit);
     }
 
     public boolean fit(Dimension dimension) {

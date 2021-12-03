@@ -11,13 +11,6 @@ import org.strauteka.jbin.core.Space;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
 public class Container extends Bin<Container> {
-    public Container(Container bin) {
-        this(bin, bin.stackConfig());
-    }
-
-    public Container(Container bin, StackConfig overStack) {
-        super(bin, overStack, bin.emptySpace(), bin.cargo());
-    }
 
     public Container(int l, int h, int w) {
         this(new Size(l, h, w));

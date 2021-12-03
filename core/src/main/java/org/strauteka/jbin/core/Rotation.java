@@ -21,7 +21,7 @@ public enum Rotation {
      *
      * @param value the integer value of the code
      */
-    private Rotation(final int value) {
+    Rotation(final int value) {
         this.value = value;
     }
 
@@ -33,18 +33,18 @@ public enum Rotation {
      */
     public static Rotation valueOf(final int value) {
         switch (value) {
-        case 0:
-            return lhw;
-        case 1:
-            return whl;
-        case 2:
-            return wlh;
-        case 3:
-            return hlw;
-        case 4:
-            return hwl;
-        default:
-            return lwh;
+            case 0:
+                return lhw;
+            case 1:
+                return whl;
+            case 2:
+                return wlh;
+            case 3:
+                return hlw;
+            case 4:
+                return hwl;
+            default:
+                return lwh;
         }
     }
 }

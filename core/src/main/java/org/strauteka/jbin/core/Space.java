@@ -51,26 +51,26 @@ public class Space extends Size {
     }
 
     public Boolean overlay(Space s) {
-        return (h_() <= s.h_() && h__() >= s.h__() //
-                && w_() <= s.w_() && w__() >= s.w__() //
+        return (h_() <= s.h_() && h__() >= s.h__()
+                && w_() <= s.w_() && w__() >= s.w__()
                 && l_() <= s.l_() && l__() >= s.l__());
     }
 
     public Boolean overlap(Space s) {
-        return (h_() < s.h__() && h__() > s.h_() //
-                && w_() < s.w__() && w__() > s.w_() //
+        return (h_() < s.h__() && h__() > s.h_()
+                && w_() < s.w__() && w__() > s.w_()
                 && l_() < s.l__() && l__() > s.l_());
     }
 
     public Boolean overlapIncluded(Space s) {
-        return (h_() <= s.h__() && h__() >= s.h_() //
-                && w_() <= s.w__() && w__() >= s.w_() //
+        return (h_() <= s.h__() && h__() >= s.h_()
+                && w_() <= s.w__() && w__() >= s.w_()
                 && l_() <= s.l__() && l__() >= s.l_());
     }
 
     public Size overlapSize(Space s) {
-        return new Size(Math.min(l__(), s.l__()) - Math.max(l_(), s.l_()), //
-                Math.min(h__(), s.h__()) - Math.max(h_(), s.h_()), //
+        return new Size(Math.min(l__(), s.l__()) - Math.max(l_(), s.l_()),
+                Math.min(h__(), s.h__()) - Math.max(h_(), s.h_()),
                 Math.min(w__(), s.w__()) - Math.max(w_(), s.w_()));
     }
 
@@ -144,9 +144,7 @@ public class Space extends Size {
             return new Space(l() + space.l() - os.l(), (h__ - h_), os.w(), Math.min(l_(), space.l_()), h_,
                     Math.max(w_(), space.w_()));
 
-        System.err.println("System Error! Space.combineSpace(Space space, StackConfig conf)");
-        return null; // no nulls :( it is handled Jesus driven developer at work...
-
+        throw new JbinCoreException("Internal JavaBin core Error. Can't combine new space!");
     }
 
     private static int findPosition(int h, int pos1, int pos2, int maxExpand) {
@@ -189,5 +187,11 @@ public class Space extends Size {
     public String toString() {
         return String.format("l: %d; h: %d; w: %d; Positions: %s; l__ %d; h__ %d; w__ %d;", l(), h(), w(),
                 position.toString(), l__(), h__(), w__());
+    }
+
+    private static class JbinCoreException extends RuntimeException {
+        public JbinCoreException(String message) {
+            super(message);
+        }
     }
 }

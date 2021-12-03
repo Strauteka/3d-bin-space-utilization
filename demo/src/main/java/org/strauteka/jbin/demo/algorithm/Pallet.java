@@ -11,19 +11,10 @@ import org.strauteka.jbin.core.Space;
 import org.strauteka.jbin.core.Rotation;
 import org.strauteka.jbin.core.configuration.StackConfig;
 
-public class Pallet extends Bin<Pallet> implements ItemImpl {
-    public final Rotation[] rotations;
-
-    private Pallet(Pallet pallet, StackConfig overStack) {
-        this(pallet, overStack, pallet.emptySpace(), pallet.cargo());
-    }
-
-    private Pallet(int l, int h, int w) {
-        this(new Size(l, h, w));
-    }
-
-    private Pallet(int l, int h, int w, StackConfig overStack) {
-        this(new Size(l, h, w), overStack);
+public class Pallet extends Bin<Pallet> implements Item {
+    public final static Rotation[] rotations;
+    static {
+        rotations = Stream.of(Rotation.lhw, Rotation.whl).toArray(Rotation[]::new);
     }
 
     private Pallet(Dimension size) {
@@ -36,15 +27,14 @@ public class Pallet extends Bin<Pallet> implements ItemImpl {
 
     private Pallet(Dimension size, StackConfig overStack, List<Space> space, List<Cargo<? extends Dimension>> cargo) {
         super(size, overStack, space, cargo);
-        rotations = Stream.of(Rotation.lhw, Rotation.whl).toArray(Rotation[]::new);
     }
 
     public static Pallet pallet(Dimension size, int h) {
-        return new Pallet(size).add(new Cargo<Size>(new Size(size.l(), h, size.w()), new Size(0, 0, 0)));
+        return new Pallet(size).add(new Cargo<>(new Size(size.l(), h, size.w()), new Size(0, 0, 0)));
     }
 
     public static Pallet pallet(Dimension size, int h, StackConfig overStack) {
-        return new Pallet(size, overStack).add(new Cargo<Size>(new Size(size.l(), h, size.w()), new Size(0, 0, 0)));
+        return new Pallet(size, overStack).add(new Cargo<>(new Size(size.l(), h, size.w()), new Size(0, 0, 0)));
     }
 
     @Override
@@ -77,10 +67,7 @@ public class Pallet extends Bin<Pallet> implements ItemImpl {
     public boolean equals(Object o) {
         if (o == null)
             return false;
-        if (o == this)
-            return true;
-
-        return false;
+        return o == this;
     }
 
     @Override

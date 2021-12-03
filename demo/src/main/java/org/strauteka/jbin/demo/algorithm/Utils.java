@@ -16,19 +16,19 @@ public class Utils {
     }
 
     private static long flag(long value, boolean a_, boolean b_, boolean c_) {
-        return value + (toValue(a_) + toValue(b_) + toValue(c_)) * -1000000000000000000l;
+        return value + (toValue(a_) + toValue(b_) + toValue(c_)) * -1000000000000000000L;
     }
 
     public static long concat(int a, int b, int c) {
-        return (a * 1000000000000l) + (b * 1000000l) + c + 9000000000000000000l;
+        return (a * 1000000000000L) + (b * 1000000L) + c + 9000000000000000000L;
     }
 
     private static int lower(int a, int b, int c, int pos) {
         if (pos == 0)
-            return a < b ? (c < a ? c : a) : (c < b ? c : b);
+            return a < b ? (Math.min(c, a)) : (Math.min(c, b));
         if (pos == 1)
-            return a < b ? (c < a ? a : (c < b ? c : b)) : (c < b ? b : (c < a ? c : a));
-        return a < b ? (c < b ? b : c) : (c < a ? a : c);
+            return a < b ? (c < a ? a : (Math.min(c, b))) : (c < b ? b : (Math.min(c, a)));
+        return a < b ? (Math.max(c, b)) : (Math.max(c, a));
     }
 
     private static int toValue(boolean value) {

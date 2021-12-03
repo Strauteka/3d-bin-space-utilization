@@ -24,7 +24,7 @@ public class StackConfig {
     private final int equalizeH;
     // filters off not usable space (executes after merge), if one of dimensions is
     // less than this parameter. Core overlap and merging spaces performance is ~
-    // n^2 type. So more items means drastically worse performance. Helps core to
+    // n^2 type. So more items' means drastically worse performance. Helps core to
     // work a lot faster.
     private final int minimumSpaceSide;
     // disable merging same height area, including over-stacking

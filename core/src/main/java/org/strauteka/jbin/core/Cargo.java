@@ -53,9 +53,8 @@ public class Cargo<T extends Dimension> extends Space {
 
     private Rotation createRotation(Rotation rotation) {
         final Dimension rotate = sidePos(rotation);
-        return Rotation.valueOf(new StringBuilder().append(this.rotate.name().charAt(rotate.l()))
-                .append(this.rotate.name().charAt(rotate.h())).append(this.rotate.name().charAt(rotate.w()))
-                .toString());
+        return Rotation.valueOf(String.valueOf(this.rotate.name().charAt(rotate.l())) +
+                this.rotate.name().charAt(rotate.h()) + this.rotate.name().charAt(rotate.w()));
     }
 
     private Dimension newPosition(Dimension holder, Rotation rotation) {
