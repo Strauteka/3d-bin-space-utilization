@@ -54,26 +54,25 @@ public class PackerUnit {
     private static Optional<Cargo<? extends Dimension>> findCargo(List<Space> spaces,
                                                                   List<Tuple2<Item, Integer>> itemUtilize, int id) {
         // looping through all spaces is time-consuming...
-        final Optional<Space> space = selectSpace(spaces, itemUtilize, id);
-        return space.flatMap(value -> createCargo(value, itemUtilize));
+        return selectSpace(spaces, itemUtilize, id)
+                .flatMap(value -> createCargo(value, itemUtilize));
 
     }
 
-    private static Optional<Space> selectSpace(List<Space> spaces, List<Tuple2<Item, Integer>> itemUtilize,
-                                               int id) {
+    private static Optional<Space> selectSpace(List<Space> spaces, List<Tuple2<Item, Integer>> itemUtilize, int id) {
+        //More time-consuming, but gives a little more efficiency
+        final List<Dimension> uniqueRotatedDimensions = itemUtilize.stream()
+                .flatMap(tuple -> Stream.of(tuple._1.rotations())
+                        .map(tuple._1::rotate))
+                .distinct()
+                .collect(Collectors.toList());
+
         // filter off spaces that can't fit any item
-        return selectSpace(
-                spaces.stream().filter(e -> itemUtilize.stream().anyMatch(x -> e.fitAny(x._1)))
-                        .collect(Collectors.toList()),
-                id);
-    }
+        return spaces.stream()
+                        .filter(e -> uniqueRotatedDimensions.stream().anyMatch(e::fitAny))
+                        .min(Comparator
+                                .comparingLong(e -> (id % 2 == 0 ? 1L : -1L) * Utils.concat(e.h_(), e.l_(), e.w_())));
 
-    private static Optional<Space> selectSpace(List<Space> validSpaces, int id) {
-        if (validSpaces.isEmpty())
-            return Optional.empty();
-        return id % 2 == 0
-                ? validSpaces.stream().min(Comparator.comparingLong(e -> Utils.concat(e.h_(), e.l_(), e.w_())))
-                : validSpaces.stream().min(Comparator.comparingLong(e -> -Utils.concat(e.h_(), e.l_(), e.w_())));
     }
 
     private static Optional<Cargo<? extends Dimension>> createCargo(Space space,
